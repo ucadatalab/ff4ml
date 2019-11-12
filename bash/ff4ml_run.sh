@@ -1,6 +1,11 @@
 #!/bin/bash
 
-
+# 
+# Authors: 
+# 	- Roberto Magán Carrión - roberto.magan@uca.es, rmagan@ugr.es
+# UCADatalab - http://datalab.uca.es , NESG(Network Engineering & Security Group) - https://nesg.ugr.es
+# Date: 2019/12/11
+#
 
 if [ "$#" -ne 1 ]; then
   echo " "
