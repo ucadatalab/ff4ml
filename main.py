@@ -27,11 +27,11 @@ def escribir_param(path_param, linea, cabecera):
     archivo.write("\n")
 
     archivo.close()
-    print("[+] ¡¡¡Línea escrita al fichero con éxito!!! [+]")
+    print("[+] ¡¡¡ SUCCESSFULLY line write!!! [+]")
     print("")
     print("")
 
-instanteInicial = datetime.now()
+instantIni = datetime.now()
 
 root_path= './files/'
 mc_file = 'ugr16_multiclass.csv'
@@ -124,8 +124,8 @@ elif model == 'svc':
 print("[+] Calculating hyperparameters for the classifier " + title + "[+]")
 print("")
 if model == 'rf':
-    parameters = {'random_state': [0], 'n_estimators': [1, 10, 100], 'criterion': ('gini', 'entropy'),
-                  'max_depth': (1, 30, 50)}
+    parameters = {'random_state': [0], 'n_estimators': [1, 10], 'criterion': ('gini', 'entropy'),
+                  'max_depth': (1, 30)}
     model_grid = RandomForestClassifier()
 elif model == 'lr':
     # parameters = {'random_state':[0], 'C':[1,5,10,100], 'solver':('liblinear', 'lbfgs'), 'multi_class':('auto', 'ovr')}
@@ -169,7 +169,6 @@ elif model =='svc':
     tmodel= SVC(random_state = 0, kernel = 'rbf', gamma = ga, C=cs, verbose=100000)
 
 
-
 # Training models
 print("[+] Training models " + "[+]")
 
@@ -192,12 +191,12 @@ for fr in h.values():
         for k,v in fr.items():
             result[k].append(v)
 
-#Podemos imprimir el diccionario, obtener sus claves
+
 k = list(result.keys())
 v = list(result.values())
 
-instanteFinal = datetime.now()
-tiempo = instanteFinal - instanteInicial # Devuelve un objeto timedelta
+instantFinal = datetime.now()
+tiempo = instantFinal - instantIni
 path_param = root_path + model + "_" + "results_" + ".csv"
 linea = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(v[2][1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(v[2][2]) + ','+ str(v[0][3]) + ',' + str(v[1][3]) + ',' + str(v[2][3]) + ',' +  str(v[0][4]) + ',' + str(v[1][4]) + ',' + str(v[2][4]) + ',' +  str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(v[2][5]) + ','+ str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(v[2][6]) + ',' + str(v[0][8]) + ',' + str(v[1][8]) + ',' + str(v[2][8]) + ',' +  str(tiempo)
 cabecera = "Rep." + "," + "Kfold" + "," + "Num. Vars." + "," + "Precision-DoS" + "," + "Recall-DoS" + "," + "F1_score_DoS" + ","  +  "Precision-Botnet" + "," + "Recall-Botnet" + "," + "F1_score_Botnet" + "," + "Precision-Scan" + "," + "Recall-Scan" + "," + "F1_score_scan" + ',' "Precision-SSHscan" + "," + "Recall-SSHscan" + "," + "F1_score_SSHscan" + ',' "Precision-UDPscan" + "," + "Recall-UDPscan" + "," + "F1_score_UDPscan" + ',' "Precision-Spam" + "," + "Recall-Spam" + "," + "F1_score_Spam" + ',' "Precision-w" + "," + "Recall-w" + "," + "F1_score_w"+ ',' +"Time"
