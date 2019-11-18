@@ -15,18 +15,18 @@ from collections import defaultdict
 from sklearn.model_selection import GridSearchCV
 
 
-def escribir_param(path_param, linea, cabecera):
+def write_param(path_param, line, header):
     if os.path.isfile(path_param):
-        archivo = open(path_param, "a")
+        f = open(path_param, "a")
     else:
-        archivo = open(path_param, "w")
-        archivo.write(cabecera)
-        archivo.write("\n")
+        f = open(path_param, "w")
+        f.write(header)
+        f.write("\n")
 
-    archivo.write(linea)
-    archivo.write("\n")
+    f.write(line)
+    f.write("\n")
 
-    archivo.close()
+    f.close()
     print("[+] ¡¡¡ SUCCESSFULLY line write!!! [+]")
     print("")
     print("")
@@ -196,14 +196,13 @@ k = list(result.keys())
 v = list(result.values())
 
 instantFinal = datetime.now()
-tiempo = instantFinal - instantIni
+time = instantFinal - instantIni
 path_param = root_path + model + "_" + "results_" + ".csv"
-linea = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(v[2][1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(v[2][2]) + ','+ str(v[0][3]) + ',' + str(v[1][3]) + ',' + str(v[2][3]) + ',' +  str(v[0][4]) + ',' + str(v[1][4]) + ',' + str(v[2][4]) + ',' +  str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(v[2][5]) + ','+ str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(v[2][6]) + ',' + str(v[0][8]) + ',' + str(v[1][8]) + ',' + str(v[2][8]) + ',' +  str(tiempo)
-cabecera = "Rep." + "," + "Kfold" + "," + "Num. Vars." + "," + "Precision-DoS" + "," + "Recall-DoS" + "," + "F1_score_DoS" + ","  +  "Precision-Botnet" + "," + "Recall-Botnet" + "," + "F1_score_Botnet" + "," + "Precision-Scan" + "," + "Recall-Scan" + "," + "F1_score_scan" + ',' "Precision-SSHscan" + "," + "Recall-SSHscan" + "," + "F1_score_SSHscan" + ',' "Precision-UDPscan" + "," + "Recall-UDPscan" + "," + "F1_score_UDPscan" + ',' "Precision-Spam" + "," + "Recall-Spam" + "," + "F1_score_Spam" + ',' "Precision-w" + "," + "Recall-w" + "," + "F1_score_w"+ ',' +"Time"
-print(linea)
+line = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][0]) + ',' + str(v[1][0]) + ',' + str(v[2][0]) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(v[2][1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(v[2][2]) + ','+ str(v[0][3]) + ',' + str(v[1][3]) + ',' + str(v[2][3]) + ',' +  str(v[0][4]) + ',' + str(v[1][4]) + ',' + str(v[2][4]) + ',' +  str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(v[2][5]) + ','+ str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(v[2][6]) + ',' + str(v[0][8]) + ',' + str(v[1][8]) + ',' + str(v[2][8]) + ',' +  str(time)
+header = "Rep." + "," + "Kfold" + "," + "Num. Vars." + "," + "Precision-Background" + "," + "Recall-Background" + "," + "F1_score_Background" + "," + "Precision-DoS" + "," + "Recall-DoS" + "," + "F1_score_DoS" + ","  +  "Precision-Botnet" + "," + "Recall-Botnet" + "," + "F1_score_Botnet" + "," + "Precision-Scan" + "," + "Recall-Scan" + "," + "F1_score_Scan" + ',' "Precision-SSHscan" + "," + "Recall-SSHscan" + "," + "F1_score_SSHscan" + ',' "Precision-UDPscan" + "," + "Recall-UDPscan" + "," + "F1_score_UDPscan" + ',' "Precision-Spam" + "," + "Recall-Spam" + "," + "F1_score_Spam" + ',' "Precision-w" + "," + "Recall-w" + "," + "F1_score_w" + ',' + "Time"
+print(line)
 
 
-escribir_param(path_param,linea,cabecera)
-print("duración: ", tiempo)
-print("------------------")
-
+write_param(path_param,line,header)
+print("Time elapsed: ", time)
+print("-------------------")
