@@ -20,17 +20,27 @@ fi
 model=$1
 
 # repetitions
-rep=20
+REP_START=1
+REP_END=1
 
-# k-folds
-kfold=5
+# K-folds
+OUTFOLD_START=1
+OUTFOLD_END=1
 
-for r in $(seq 1 $rep);
+FLAGS="--job-name="MDPI_FE" --exclusive --cpus-per-task=1 --time=7-00:00:00 --mem=16GB --error=../logs/job.%J.err --output=../logs/job.%J.out"
+
+TOTAL=0
+
+for ((r=$REP_START; r<=$REP_END; r++))
 do
-	for k in $(seq 1 $kfold);
-	do
-		echo "[+] Running experiment -- Rep: $r, K-fold: $k"
-		python ../main.py $model $r $k
-	done
+    for ((k=$OUTFOLD_START; k<=$OUTFOLD_END; k++))
+    do
+	echo "[+] Running experiment, model: $model, rep: $r, k-fold: $k"
+        sbatch $FLAGS --wrap="python ../main.py $model $r $k"
+        TOTAL=`expr $TOTAL + 1`
+        sleep 2s
+    done
 done
+
+echo "[+] $TOTAL repetitions have been launched"
 
