@@ -27,7 +27,11 @@ REP_END=1
 OUTFOLD_START=1
 OUTFOLD_END=1
 
-FLAGS="--job-name="MDPI_FE" --exclusive --cpus-per-task=1 --time=7-00:00:00 --mem=16GB --error=../logs/job.%J.err --output=../logs/job.%J.out"
+#To run each task in a whole CPU
+#FLAGS="--job-name="MDPI_FE" --exclusive --cpus-per-task=1 --time=7-00:00:00 --mem=16GB --error=../logs/job.%J.err --output=../logs/job.%J.out"
+
+#To run each task in just one core of a CPU
+FLAGS="--job-name="MDPI_FE" --task=1 --time=7-00:00:00 --mem=16GB --error=../logs/job.%J.err --output=../logs/job.%J.out"
 
 TOTAL=0
 
