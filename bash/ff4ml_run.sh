@@ -27,6 +27,12 @@ REP_END=1
 OUTFOLD_START=1
 OUTFOLD_END=1
 
+# execution timestamp
+exec_ts=`date +"%Y%m%d_%H%M%S"`
+
+# make the execution folder
+mkdir -p ../results/$exec_ts
+
 #To run each task in a whole CPU
 #FLAGS="--job-name="MDPI_FE" --exclusive --cpus-per-task=1 --time=7-00:00:00 --mem=16GB --error=../logs/job.%J.err --output=../logs/job.%J.out"
 
@@ -35,12 +41,14 @@ FLAGS="--job-name="MDPI_FE" --task=1 --time=7-00:00:00 --mem=16GB --error=../log
 
 TOTAL=0
 
+echo "[+] Running experiment $exec_ts ..."
+
 for ((r=$REP_START; r<=$REP_END; r++))
 do
     for ((k=$OUTFOLD_START; k<=$OUTFOLD_END; k++))
     do
-	echo "[+] Running experiment, model: $model, rep: $r, k-fold: $k"
-        sbatch $FLAGS --wrap="python ../main.py $model $r $k"
+	echo "[-] Running task for model: $model, rep: $r, k-fold: $k"
+        sbatch $FLAGS --wrap="python ../main.py $model $r $k $exec_ts"
         TOTAL=`expr $TOTAL + 1`
         sleep 2s
     done
