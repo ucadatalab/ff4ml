@@ -11,22 +11,19 @@
 """
 
 import argparse
-
 import pandas as pd
-import itertools
 import os
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_curve, roc_auc_score
+from sklearn.metrics import roc_curve, roc_auc_score, auc
 from sklearn.metrics import classification_report
 from datetime import datetime
-from sklearn.metrics import precision_score
-from sklearn.metrics import precision_recall_fscore_support
 import sys
 from collections import defaultdict
 from sklearn.model_selection import GridSearchCV
+from sklearn.preprocessing import label_binarize
 
 def getArguments():
     """
@@ -86,60 +83,58 @@ def main(args):
 
     # Column categorical label numeric transformation
 
-    df.loc[:,'outcome.multiclass']=df['outcome.multiclass'].map({'background': 0, 'dos': 1, 'nerisbotnet':2, 'scan':3, 'sshscan':4,'udpscan':5,'spam':6})
-
+    df.loc[:, 'outcome.multiclass'] = df['outcome.multiclass'].map(
+        {'background': 0, 'dos': 1, 'nerisbotnet': 2, 'scan': 3, 'sshscan': 4, 'udpscan': 5, 'spam': 6})
 
     # Feature selection
 
-    d=(df_vars.groupby('repeticion').groups[rep]) & (df_vars.groupby('caja.de.test').groups[kfold])
-    print("d: ",d)
+    d = (df_vars.groupby('repeticion').groups[rep]) & (df_vars.groupby('caja.de.test').groups[kfold])
+
     print("rep: ", rep)
     print("kfold: ", kfold)
 
-    size=df_vars.shape[1]
-    f=['']
+    size = df_vars.shape[1]
+    f = ['']
 
-    for i in range (1,size):
-        if int(df_vars.iloc[d,i])==1:
-             f.append(df_vars.iloc[d,i].name)
+    for i in range(1, size):
+        if int(df_vars.iloc[d, i]) == 1:
+            f.append(df_vars.iloc[d, i].name)
 
     f.remove("")
-    if kfold==1:
+    if kfold == 1:
         f.remove("caja.de.test")
 
     # Data separation and label
 
-    X=df[f]
-    y=df['outcome.multiclass']
-
-
-
+    X = df[f]
+    y = df['outcome.multiclass']
 
     # Creation of TRAINING and TEST datasets according to the number of fold.
 
-    group='REP.'+ str(rep)
+    group = 'REP.' + str(rep)
 
+    rows_fold = df_folds.iloc[df_folds.groupby(group).groups[kfold]].index
 
-    rows_fold=df_folds.iloc[df_folds.groupby(group).groups[kfold]].index
+    No_rows_fold = df_folds[df_folds[group] != kfold][group].index
+    No_rows_fold = df_folds[df_folds[group] != kfold][group].index
 
-    No_rows_fold= df_folds[df_folds[group]!=kfold][group].index
-    No_rows_fold= df_folds[df_folds[group]!=kfold][group].index
+    # Data TRAIN and LABEL
+    X_train = X.drop(X.index[rows_fold])
+    y_train = y.drop(y.index[rows_fold])
+    y_train = label_binarize(y_train, classes=[0, 1, 2, 3, 4, 5, 6])
 
+    # Data TEST and LABEL
+    X_test = X.drop(X.index[No_rows_fold])
+    y_test = y.drop(y.index[No_rows_fold])
+    y_test = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6])
 
-        # Data TRAIN and LABEL
-    X_train=X.drop(X.index[rows_fold])
-    y_train=y.drop(y.index[rows_fold])
-
-        # Data TEST and LABEL
-    X_test=X.drop(X.index[No_rows_fold])
-    y_test=y.drop(y.index[No_rows_fold])
-    n_classes=7
-
+    n_classes = y_train.shape[1]
 
     # Data normalization
 
     X_train_scaled = StandardScaler().fit_transform(X_train)
     X_test_scaled = StandardScaler().fit_transform(X_test)
+
 
     # Hyperparameters Selection
 
@@ -173,30 +168,30 @@ def main(args):
     bp = clf.best_params_
 
     # PARAMETERS SELECTED
-
+    print("[+] PARAMETERS SELECTED MODEL " + title + " [+]")
+    print("")
     if model == 'rf':
-        cr=str(bp.get('criterion'))
-        print("cr: ",cr)
+        cr = str(bp.get('criterion'))
+        print("Criterion: ", cr)
         md = int(bp.get('max_depth'))
-        print("md: ",md)
+        print("Max_Depth: ", md)
         nit = int(bp.get('n_estimators'))
-        print("nit: ", nit)
-        tmodel = RandomForestClassifier(criterion = cr, max_depth = md, random_state = 0, n_estimators = nit, verbose=100000)
-    elif model =='lr':
-        cs=int(bp.get('C'))
-        print("cs: ",cs)
+        print("N_Estimators: ", nit)
+        tmodel = RandomForestClassifier(criterion=cr, max_depth=md, random_state=0, n_estimators=nit, verbose=100000)
+    elif model == 'lr':
+        cs = int(bp.get('C'))
+        print("cs: ", cs)
         solv = str(bp.get('solver'))
-        print("solv: ",solv)
+        print("solv: ", solv)
         mc = str(bp.get('multi_class'))
         print("mc: ", mc)
-        tmodel = LogisticRegression(random_state = 0, C=cs, solver = solv, multi_class = mc, verbose=100000)
-    elif model =='svc':
-        cs=int(bp.get('C'))
-        print("cs: ",cs)
-        ga=float(bp.get('gamma'))
-        print("ga: ",ga)
-        tmodel= SVC(random_state = 0, kernel = 'rbf', gamma = ga, C=cs, verbose=100000)
-
+        tmodel = LogisticRegression(random_state=0, C=cs, solver=solv, multi_class=mc, verbose=100000)
+    elif model == 'svc':
+        cs = int(bp.get('C'))
+        print("cs: ", cs)
+        ga = float(bp.get('gamma'))
+        print("ga: ", ga)
+        tmodel = SVC(random_state=0, kernel='rbf', gamma=ga, C=cs, verbose=100000)
 
     # Training models
     print("[+] Training models " + "[+]")
@@ -208,33 +203,67 @@ def main(args):
     predictions = tmodel.predict(X_test_scaled)
     print("")
     print("[+] CLASSIFICATION REPORT " + model + "\n")
-    h=classification_report(y_test, predictions, output_dict=True, target_names= ['Background', 'Dos', 'Nerisbotnet','Scan','SSHscan','UDPscam','Spam'])
-    print(classification_report(y_test, predictions, target_names= ['Background', 'Dos', 'Nerisbotnet','Scan','SSHscan','UDPscam','Spam']))
+    h = classification_report(y_test, predictions, output_dict=True,
+                              target_names=['Background', 'Dos', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscam', 'Spam'])
+    print(classification_report(y_test, predictions,
+                                target_names=['Background', 'Dos', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscam',
+                                              'Spam']))
     print("")
-    result = defaultdict(list)
 
+    # Store Classification Report into 'dict'
+    result = defaultdict(list)
     for fr in h.values():
         if isinstance(fr, float):
             print("")
         else:
-            for k,v in fr.items():
+            for k, v in fr.items():
                 result[k].append(v)
 
-
+        # Store keys and values
     k = list(result.keys())
     v = list(result.values())
+
+    # Compute ROC area for each class
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(y_test[:, i], predictions[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+        # Compute ROC area weighted
+    supports_sum = 0
+    auc_partial = 0
+    for i in range(n_classes):
+        supports_sum = supports_sum + (v[3][i])
+        auc_partial = auc_partial + ((v[3][i]) * roc_auc[i])
+    auc_w = auc_partial / supports_sum
+
+    print("SUM SUPPORTS: ", supports_sum)
+    print("AUC_PARTIAL: ", auc_partial)
+    print("AUC_W: ", auc_w)
+    print("")
+
+    # Send data to .csv
 
     instantFinal = datetime.now()
     time = instantFinal - instantIni
     path_param = root_path + model + "_" + "results_" + ".csv"
-    line = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][0]) + ',' + str(v[1][0]) + ',' + str(v[2][0]) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(v[2][1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(v[2][2]) + ','+ str(v[0][3]) + ',' + str(v[1][3]) + ',' + str(v[2][3]) + ',' +  str(v[0][4]) + ',' + str(v[1][4]) + ',' + str(v[2][4]) + ',' +  str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(v[2][5]) + ','+ str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(v[2][6]) + ',' + str(v[0][8]) + ',' + str(v[1][8]) + ',' + str(v[2][8]) + ',' +  str(time)
-    header = "Rep." + "," + "Kfold" + "," + "Num. Vars." + "," + "Precision-Background" + "," + "Recall-Background" + "," + "F1_score_Background" + "," + "Precision-DoS" + "," + "Recall-DoS" + "," + "F1_score_DoS" + ","  +  "Precision-Botnet" + "," + "Recall-Botnet" + "," + "F1_score_Botnet" + "," + "Precision-Scan" + "," + "Recall-Scan" + "," + "F1_score_Scan" + ',' "Precision-SSHscan" + "," + "Recall-SSHscan" + "," + "F1_score_SSHscan" + ',' "Precision-UDPscan" + "," + "Recall-UDPscan" + "," + "F1_score_UDPscan" + ',' "Precision-Spam" + "," + "Recall-Spam" + "," + "F1_score_Spam" + ',' "Precision-w" + "," + "Recall-w" + "," + "F1_score_w" + ',' + "Time"
-    print(line)
+    line = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][0]) + ',' + str(v[1][0]) + ',' + str(
+        v[2][0]) + ',' + str(roc_auc[0]) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(v[2][1]) + ',' + str(
+        roc_auc[1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(v[2][2]) + ',' + str(roc_auc[2]) + ',' + str(
+        v[0][3]) + ',' + str(v[1][3]) + ',' + str(v[2][3]) + ',' + str(roc_auc[3]) + ',' + str(v[0][4]) + ',' + str(
+        v[1][4]) + ',' + str(v[2][4]) + ',' + str(roc_auc[4]) + ',' + str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(
+        v[2][5]) + ',' + str(roc_auc[5]) + ',' + str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(v[2][6]) + ',' + str(
+        roc_auc[6]) + ',' + str(v[0][8]) + ',' + str(v[1][8]) + ',' + str(v[2][8]) + ',' + str(auc_w) + ',' + str(time)
+    header = "Rep." + "," + "Kfold" + "," + "Num. Vars." + "," + "Precision-Background" + "," + "Recall-Background" + "," + "F1_score_Background" + "," + "AUC_Background" + "," + "Precision-DoS" + "," + "Recall-DoS" + "," + "F1_score_DoS" + "," + "AUC_DoS" + "," + "Precision-Botnet" + "," + "Recall-Botnet" + "," + "F1_score_Botnet" + "," + "AUC_Botnet" + "," + "Precision-Scan" + "," + "Recall-Scan" + "," + "F1_score_Scan" + "," + "AUC_Scan" + "," + "Precision-SSHscan" + "," + "Recall-SSHscan" + "," + "F1_score_SSHscan" + "," + "AUC_SSHscan" + "," + "Precision-UDPscan" + "," + "Recall-UDPscan" + "," + "F1_score_UDPscan" + "," + "AUC_UDPscan" + "," + "Precision-Spam" + "," + "Recall-Spam" + "," + "F1_score_Spam" + "," + "AUC_Spam" + "," + "Precision-w" + "," + "Recall-w" + "," + "F1_score_w" + "," + "AUC_w" + "," + "Time"
 
+    write_param(path_param, line, header)
 
-    write_param(path_param,line,header)
+    print("------------------")
+    print(" [+] REP: ---" + str(rep) + "---" + " Kfold: " + "---" +  str(kfold) + "--- Model: ---" + title + "---" + " ¡¡TERMINATED!! [+]")
+    print("------------------")
     print("Time elapsed: ", time)
-    print("-------------------")
 
 if __name__ == "__main__":
     args = getArguments()
