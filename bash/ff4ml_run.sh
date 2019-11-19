@@ -21,11 +21,11 @@ model=$1
 
 # repetitions
 REP_START=1
-REP_END=1
+REP_END=2
 
 # K-folds
 OUTFOLD_START=1
-OUTFOLD_END=1
+OUTFOLD_END=3
 
 # execution timestamp
 exec_ts=`date +"%Y%m%d_%H%M%S"`
@@ -41,7 +41,7 @@ FLAGS="--job-name="MDPI_FE" --task=1 --time=7-00:00:00 --mem=16GB --error=../log
 
 TOTAL=0
 
-echo "[+] Running experiment $exec_ts ..."
+echo "[+] Running experiment $exec_ts with rep ($REP_START,$REP_END) and k-folds ($OUTFOLD_START,$OUTFOLD_END)"
 
 for ((r=$REP_START; r<=$REP_END; r++))
 do
@@ -54,5 +54,5 @@ do
     done
 done
 
-echo "[+] $TOTAL repetitions have been launched"
+echo "[+] $TOTAL repetitions have been launched for the experiment $exec_ts"
 
