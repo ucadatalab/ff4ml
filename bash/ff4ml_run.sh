@@ -21,7 +21,7 @@ model=$1
 
 # repetitions
 REP_START=1
-REP_END=2
+REP_END=1
 
 # K-folds
 OUTFOLD_START=1
