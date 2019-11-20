@@ -16,6 +16,9 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
+# Notifications
+n_to=roberto.magan@uca.es
+
 # model
 model=$1
 
@@ -40,7 +43,7 @@ mkdir -p ../logs/$exec_ts
 #FLAGS="--job-name="MDPI_FE" --exclusive --cpus-per-task=1 --time=7-00:00:00 --mem=16GB --error=../logs/job.%J.err --output=../logs/job.%J.out"
 
 #To run each task in just one core of a CPU
-FLAGS="--job-name="MDPI_FE" --tasks=1 --time=7-00:00:00 --mem=16GB --error=../logs/$exec_ts/job.%J.err --output=../logs/$exec_ts/job.%J.out"
+FLAGS="--job-name="MDPI_FE" --tasks=1 --time=7-00:00:00 --mem=16GB --mail-user=$n_to --mail-type=END,FAIL,TIME_LIMIT_80 --error=../logs/$exec_ts/job.%J.err --output=../logs/$exec_ts/job.%J.out"
 
 TOTAL=0
 
