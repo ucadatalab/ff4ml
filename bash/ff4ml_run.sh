@@ -11,7 +11,7 @@ if [ "$#" -ne 1 ]; then
   echo " "
   echo "Use: bash ff4ml_run.sh <model>"
   echo "Example of use:"
-  echo "<model> can be: svm, rf, lr"
+  echo "<model> can be: svc, rf, lr"
   echo " "
   exit 1
 fi
@@ -28,7 +28,7 @@ REP_END=1
 
 # K-folds
 OUTFOLD_START=1
-OUTFOLD_END=3
+OUTFOLD_END=1
 
 # execution timestamp
 exec_ts=`date +"%Y%m%d_%H%M%S"`
