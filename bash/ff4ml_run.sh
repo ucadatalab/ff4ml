@@ -17,7 +17,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 # Notifications
-n_to=roberto.magan@uca.es
+n_to=ignacio.diaz@uca.es
 
 # model
 model=$1
@@ -54,7 +54,7 @@ do
     for ((k=$OUTFOLD_START; k<=$OUTFOLD_END; k++))
     do
 	echo "[-] Running task for model: $model, rep: $r, k-fold: $k"
-        sbatch $FLAGS --wrap="python ../main.py $model $r $k $exec_ts"
+        sbatch $FLAGS --wrap="python ../main.py $model $r $k"
         TOTAL=`expr $TOTAL + 1`
         sleep 2s
     done
