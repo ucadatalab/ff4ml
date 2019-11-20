@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "../main.py", line 242, in <module>
+    main(args)
+  File "../main.py", line 74, in main
+    df = pd.DataFrame(pd.read_csv(root_path + mc_file, index_col=0))
+  File "/apps/anaconda3-python3.6/lib/python3.6/site-packages/pandas/io/parsers.py", line 655, in parser_f
+    return _read(filepath_or_buffer, kwds)
+  File "/apps/anaconda3-python3.6/lib/python3.6/site-packages/pandas/io/parsers.py", line 405, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/apps/anaconda3-python3.6/lib/python3.6/site-packages/pandas/io/parsers.py", line 764, in __init__
+    self._make_engine(self.engine)
+  File "/apps/anaconda3-python3.6/lib/python3.6/site-packages/pandas/io/parsers.py", line 985, in _make_engine
+    self._engine = CParserWrapper(self.f, **self.options)
+  File "/apps/anaconda3-python3.6/lib/python3.6/site-packages/pandas/io/parsers.py", line 1605, in __init__
+    self._reader = parsers.TextReader(src, **kwds)
+  File "pandas/_libs/parsers.pyx", line 394, in pandas._libs.parsers.TextReader.__cinit__ (pandas/_libs/parsers.c:4209)
+  File "pandas/_libs/parsers.pyx", line 710, in pandas._libs.parsers.TextReader._setup_parser_source (pandas/_libs/parsers.c:8873)
+FileNotFoundError: File b'./files/ugr16_multiclass.csv' does not exist
