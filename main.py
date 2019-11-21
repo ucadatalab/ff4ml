@@ -66,8 +66,10 @@ def main(args):
     instantIni = datetime.now()
 
     root_path= '../data/'
+ #   root_path = './data/'
     root_path_output = '../results/' + str(ts) + '/'
-    path_param_output_json = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
+  #  root_path_output = './results/'
+
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
     mcvars_file = 'ugr16_multiclass_folds_selecvars.csv'
@@ -89,8 +91,7 @@ def main(args):
 
     # Column categorical label numeric transformation
 
-    df.loc[:, 'outcome.multiclass'] = df['outcome.multiclass'].map(
-        {'background': 0, 'dos': 1, 'nerisbotnet': 2, 'scan': 3, 'sshscan': 4, 'udpscan': 5, 'spam': 6})
+    df.loc[:, 'outcome.multiclass'] = df['outcome.multiclass'].map({'background': 0, 'dos': 1, 'nerisbotnet': 2, 'scan': 3, 'sshscan': 4, 'udpscan': 5, 'spam': 6})
 
     # Feature selection
 
@@ -207,11 +208,8 @@ def main(args):
     predictions = tmodel.predict(X_test_scaled)
     print("")
     print("[+] CLASSIFICATION REPORT " + model + "\n")
-    h = classification_report(y_test, predictions, output_dict=True,
-                              target_names=['Background', 'Dos', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscam', 'Spam'])
-    print(classification_report(y_test, predictions,
-                                target_names=['Background', 'Dos', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscam',
-                                              'Spam']))
+    h = classification_report(y_test, predictions, output_dict=True, target_names=['Background', 'Dos', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscam', 'Spam'])
+    print(classification_report(y_test, predictions, target_names=['Background', 'Dos', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscam', 'Spam']))
     print("")
 
     # Store Classification Report into 'dict'
@@ -252,17 +250,9 @@ def main(args):
 
     instantFinal = datetime.now()
     time = instantFinal - instantIni
-    path_param_output = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "results" + ".csv"
-    path_param_output_json = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "results" + ".json"
-    line = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][0]) + ',' + str(v[1][0]) + ',' + str(
-        v[2][0]) + ',' + str(v[3][0]) + ',' + str(roc_auc[0]) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(
-        v[2][1]) + ',' + str(v[3][1]) + ',' + str(roc_auc[1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(
-        v[2][2]) + ',' + str(v[3][2]) + ',' + str(roc_auc[2]) + ',' + str(v[0][3]) + ',' + str(v[1][3]) + ',' + str(
-        v[2][3]) + ',' + str(v[3][3]) + ',' + str(roc_auc[3]) + ',' + str(v[0][4]) + ',' + str(v[1][4]) + ',' + str(
-        v[2][4]) + ',' + str(v[3][4]) + ',' + str(roc_auc[4]) + ',' + str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(
-        v[2][5]) + ',' + str(v[3][5]) + ',' + str(roc_auc[5]) + ',' + str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(
-        v[2][6]) + ',' + str(v[3][6]) + ',' + str(roc_auc[6]) + ',' + str(v[0][9]) + ',' + str(v[1][9]) + ',' + str(
-        v[2][9]) + ',' + str(v[3][9]) + ',' + str(auc_w) + ',' + str(time)
+    path_param_output = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".csv"
+    path_param_output_json = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
+    line = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][0]) + ',' + str(v[1][0]) + ',' + str(v[2][0]) + ',' + str(v[3][0]) + ',' + str(roc_auc[0]) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(v[2][1]) + ',' + str(v[3][1]) + ',' + str(roc_auc[1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(v[2][2]) + ',' + str(v[3][2]) + ',' + str(roc_auc[2]) + ',' + str(v[0][3]) + ',' + str(v[1][3]) + ',' + str(v[2][3]) + ',' + str(v[3][3]) + ',' + str(roc_auc[3]) + ',' + str(v[0][4]) + ',' + str(v[1][4]) + ',' + str(v[2][4]) + ',' + str(v[3][4]) + ',' + str(roc_auc[4]) + ',' + str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(v[2][5]) + ',' + str(v[3][5]) + ',' + str(roc_auc[5]) + ',' + str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(v[2][6]) + ',' + str(v[3][6]) + ',' + str(roc_auc[6]) + ',' + str(v[0][9]) + ',' + str(v[1][9]) + ',' + str(v[2][9]) + ',' + str(v[3][9]) + ',' + str(auc_w) + ',' + str(time)
     header = "Rep." + "," + "Kfold" + "," + "Num. Vars." + "," + "Precision-Background" + "," + "Recall-Background" + "," + "F1_score_Background" + "," + "Num. Obs. Background" + "," + "AUC_Background" + "," + "Precision-DoS" + "," + "Recall-DoS" + "," + "F1_score_DoS" + "," + "Num. Obs. Dos" + "," + "AUC_DoS" + "," "Precision-Botnet" + "," + "Recall-Botnet" + "," + "F1_score_Botnet" + "," + "Num. Obs. Botnet" + "," + "AUC_Botnet" + "," + "Precision-Scan" + "," + "Recall-Scan" + "," + "F1_score_Scan" + "," + "Num. Obs. Scan" + "," + "AUC_Scan" + "," + "Precision-SSHscan" + "," + "Recall-SSHscan" + "," + "F1_score_SSHscan" + "," + "Num. Obs. SSHscan" + "," + "AUC_SSHscan" + "," + "Precision-UDPscan" + "," + "Recall-UDPscan" + "," + "F1_score_UDPscan" + "," + "Num. Obs. UDPscan" + "," + "AUC_UDPscan" + "," + "Precision-Spam" + "," + "Recall-Spam" + "," + "F1_score_Spam" + "," + "Num. Obs. Spam" + "," + "AUC_Spam" + "," + "Precision-w" + "," + "Recall-w" + "," + "F1_score_w" + "," + "Total Obs." + "," + "AUC_w" + "," + "Time"
     # + str(ts)
 
