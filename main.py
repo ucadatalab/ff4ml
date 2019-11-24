@@ -37,7 +37,7 @@ def getArguments():
     parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
     parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-  #  parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
+    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
     args = parser.parse_args()
     return args
 
@@ -61,14 +61,14 @@ def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-  #  ts=args.exec_ts  # Ejecución en supercomputador
+    ts=args.exec_ts  # Ejecución en supercomputador
 
     instantIni = datetime.now()
 
-  #  root_path= '../data/'  # Ejecución en supercomputador
-    root_path = './data/'  # Ejecución en local
- #   root_path_output = '../results/' + str(ts) + '/'  # Ejecución en supercomputador
-    root_path_output = './results/'   # Ejecución en local
+   root_path= '../data/'  # Ejecución en supercomputador
+ #   root_path = './data/'  # Ejecución en local
+    root_path_output = '../results/' + str(ts) + '/'  # Ejecución en supercomputador
+ #  root_path_output = './results/'   # Ejecución en local
 
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
