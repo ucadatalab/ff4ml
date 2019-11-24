@@ -24,7 +24,7 @@ import sys
 from collections import defaultdict
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import label_binarize
-
+import json
 
 def getArguments():
     """
@@ -37,7 +37,7 @@ def getArguments():
     parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
     parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.')
+  #  parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
     args = parser.parse_args()
     return args
 
@@ -61,14 +61,14 @@ def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-    ts=args.exec_ts
+  #  ts=args.exec_ts  # Ejecución en supercomputador
 
     instantIni = datetime.now()
 
-    root_path= '../data/'
- #   root_path = './data/'
-    root_path_output = '../results/' + str(ts) + '/'
-  #  root_path_output = './results/'
+  #  root_path= '../data/'  # Ejecución en supercomputador
+    root_path = './data/'  # Ejecución en local
+ #   root_path_output = '../results/' + str(ts) + '/'  # Ejecución en supercomputador
+    root_path_output = './results/'   # Ejecución en local
 
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
@@ -172,6 +172,16 @@ def main(args):
     print("")
     bp = clf.best_params_
 
+    # Save selected parameters to .json
+
+    path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(
+        kfold) + "_" + "output" + ".json"
+    with open(path_param_output_json_bp, "w") as fi:
+        json.dump(bp, fi)
+
+    print("---BEST PARAMETERS WRITED---")
+
+
     # PARAMETERS SELECTED
     print("[+] PARAMETERS SELECTED MODEL " + title + " [+]")
     print("")
@@ -251,23 +261,24 @@ def main(args):
     instantFinal = datetime.now()
     time = instantFinal - instantIni
     path_param_output = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".csv"
-    path_param_output_json = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
+    path_param_output_json_fpr = root_path_output + "FPR_" + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
+    path_param_output_json_tpr = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
+
     line = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][0]) + ',' + str(v[1][0]) + ',' + str(v[2][0]) + ',' + str(v[3][0]) + ',' + str(roc_auc[0]) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(v[2][1]) + ',' + str(v[3][1]) + ',' + str(roc_auc[1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(v[2][2]) + ',' + str(v[3][2]) + ',' + str(roc_auc[2]) + ',' + str(v[0][3]) + ',' + str(v[1][3]) + ',' + str(v[2][3]) + ',' + str(v[3][3]) + ',' + str(roc_auc[3]) + ',' + str(v[0][4]) + ',' + str(v[1][4]) + ',' + str(v[2][4]) + ',' + str(v[3][4]) + ',' + str(roc_auc[4]) + ',' + str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(v[2][5]) + ',' + str(v[3][5]) + ',' + str(roc_auc[5]) + ',' + str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(v[2][6]) + ',' + str(v[3][6]) + ',' + str(roc_auc[6]) + ',' + str(v[0][9]) + ',' + str(v[1][9]) + ',' + str(v[2][9]) + ',' + str(v[3][9]) + ',' + str(auc_w) + ',' + str(time)
     header = "Rep." + "," + "Kfold" + "," + "Num. Vars." + "," + "Precision-Background" + "," + "Recall-Background" + "," + "F1_score_Background" + "," + "Num. Obs. Background" + "," + "AUC_Background" + "," + "Precision-DoS" + "," + "Recall-DoS" + "," + "F1_score_DoS" + "," + "Num. Obs. Dos" + "," + "AUC_DoS" + "," "Precision-Botnet" + "," + "Recall-Botnet" + "," + "F1_score_Botnet" + "," + "Num. Obs. Botnet" + "," + "AUC_Botnet" + "," + "Precision-Scan" + "," + "Recall-Scan" + "," + "F1_score_Scan" + "," + "Num. Obs. Scan" + "," + "AUC_Scan" + "," + "Precision-SSHscan" + "," + "Recall-SSHscan" + "," + "F1_score_SSHscan" + "," + "Num. Obs. SSHscan" + "," + "AUC_SSHscan" + "," + "Precision-UDPscan" + "," + "Recall-UDPscan" + "," + "F1_score_UDPscan" + "," + "Num. Obs. UDPscan" + "," + "AUC_UDPscan" + "," + "Precision-Spam" + "," + "Recall-Spam" + "," + "F1_score_Spam" + "," + "Num. Obs. Spam" + "," + "AUC_Spam" + "," + "Precision-w" + "," + "Recall-w" + "," + "F1_score_w" + "," + "Total Obs." + "," + "AUC_w" + "," + "Time"
-    # + str(ts)
 
     write_param(path_param_output, line, header)
 
     # Send data to .json
-    with open(path_param_output_json, "w") as fpr_dict:
+    with open(path_param_output_json_fpr, "w") as fpr_dict:
         for nombre, valor in fpr.items():
             fpr_dict.write("%s %s\n" % (nombre, valor))
-        print("FPR WRITED")
+        print("---FPR WRITED---")
 
-    with open(path_param_output_json, "w") as tpr_dict:
+    with open(path_param_output_json_tpr, "w") as tpr_dict:
         for nombre, valor in tpr.items():
             tpr_dict.write("%s %s\n" % (nombre, valor))
-        print("TPR WRITED")
+        print("---TPR WRITED---")
 
     print("------------------")
     print(" [+] REP: ---" + str(rep) + "---" + " Kfold: " + "---" +  str(kfold) + "--- Model: ---" + title + "---" + " ¡¡TERMINATED!! [+]")
