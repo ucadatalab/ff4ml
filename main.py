@@ -26,6 +26,18 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import label_binarize
 import json
 
+# Models verbose
+verbose = False
+
+# Labels mapping
+classes_map = {'background': 0,
+               'dos': 1,
+               'nerisbotnet': 2,
+               'scan': 3,
+               'sshscan': 4,
+               'udpscan': 5,
+               'spam': 6}
+
 def getArguments():
     """
     Function to get input arguments from configuration file
@@ -40,6 +52,7 @@ def getArguments():
     parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
     args = parser.parse_args()
     return args
+
 
 def write_param(path_param, line, header):
     if os.path.isfile(path_param):
@@ -57,28 +70,25 @@ def write_param(path_param, line, header):
     print("")
     print("")
 
+
 def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-    ts=args.exec_ts  # Ejecución en supercomputador
+    ts=args.exec_ts
 
     instantIni = datetime.now()
 
-   root_path= '../data/'  # Ejecución en supercomputador
- #   root_path = './data/'  # Ejecución en local
-    root_path_output = '../results/' + str(ts) + '/'  # Ejecución en supercomputador
- #  root_path_output = './results/'   # Ejecución en local
+    root_path = '../data/'
+    root_path_output = '../results/' + str(ts) + '/'
 
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
     mcvars_file = 'ugr16_multiclass_folds_selecvars.csv'
 
-
-
-    df = pd.DataFrame(pd.read_csv(root_path + mc_file, index_col=0))
-    df_folds = pd.DataFrame(pd.read_csv(root_path + mcfold_file, engine='python'))
-    df_vars = pd.DataFrame(pd.read_csv(root_path + mcvars_file, engine='python'))
+    df = pd.read_csv(root_path + mc_file, index_col=0)
+    df_folds = pd.read_csv(root_path + mcfold_file)
+    df_vars = pd.read_csv(root_path + mcvars_file)
     print("[+] ¡¡Reading of datasets!! [+]")
     print("")
     print("")
@@ -89,12 +99,7 @@ def main(args):
     print("- " + mcvars_file + " SUCCESSFULLY!! [+]")
     print("")
 
-    # Column categorical label numeric transformation
-
-    df.loc[:, 'outcome.multiclass'] = df['outcome.multiclass'].map({'background': 0, 'dos': 1, 'nerisbotnet': 2, 'scan': 3, 'sshscan': 4, 'udpscan': 5, 'spam': 6})
-
     # Feature selection
-
     d = (df_vars.groupby('repeticion').groups[rep]) & (df_vars.groupby('caja.de.test').groups[kfold])
 
     print("rep: ", rep)
@@ -114,7 +119,7 @@ def main(args):
     # Data separation and label
 
     X = df[f]
-    y = df['outcome.multiclass']
+    y = df['outcome.multiclass'].map(classes_map)
 
     # Creation of TRAINING and TEST datasets according to the number of fold.
 
@@ -164,7 +169,7 @@ def main(args):
         parameters = {'gamma': [0.001, 0.01, 0.1, 1], 'C': [0.001, 0.01, 0.1, 1, 10, 100]}
         model_grid = SVC()
 
-    clf = GridSearchCV(model_grid, parameters, cv=5, verbose=100000)
+    clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
     clf.fit(X_train_scaled, y_train)
     print("")
     print("[+] The best parameters for " + "Rep.: " + str(rep) + " and Kfold: " + str(kfold) + " are:  [+]")
@@ -192,7 +197,7 @@ def main(args):
         print("Max_Depth: ", md)
         nit = int(bp.get('n_estimators'))
         print("N_Estimators: ", nit)
-        tmodel = RandomForestClassifier(criterion=cr, max_depth=md, random_state=0, n_estimators=nit, verbose=100000)
+        tmodel = RandomForestClassifier(criterion=cr, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
     elif model == 'lr':
         cs = int(bp.get('C'))
         print("cs: ", cs)
@@ -200,13 +205,13 @@ def main(args):
         print("solv: ", solv)
         mc = str(bp.get('multi_class'))
         print("mc: ", mc)
-        tmodel = LogisticRegression(random_state=0, C=cs, solver=solv, multi_class=mc, verbose=100000)
+        tmodel = LogisticRegression(random_state=0, C=cs, solver=solv, multi_class=mc, verbose=verbose)
     elif model == 'svc':
         cs = int(bp.get('C'))
         print("cs: ", cs)
         ga = float(bp.get('gamma'))
         print("ga: ", ga)
-        tmodel = SVC(random_state=0, kernel='rbf', gamma=ga, C=cs, verbose=100000)
+        tmodel = SVC(random_state=0, kernel='rbf', gamma=ga, C=cs, verbose=verbose)
 
     # Training models
     print("[+] Training models " + "[+]")
