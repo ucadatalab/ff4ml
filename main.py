@@ -17,11 +17,10 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_curve, roc_auc_score, auc
+from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import classification_report
 from datetime import datetime
-import sys
-from collections import defaultdict
+
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import label_binarize
 import json
@@ -56,16 +55,16 @@ def getArguments():
 
 def write_param(path_param, line, header):
     if os.path.isfile(path_param):
-        f = open(path_param, "a")
+        file = open(path_param, "a")
     else:
-        f = open(path_param, "w")
-        f.write(header)
-        f.write("\n")
+        file = open(path_param, "w")
+        file.write(header)
+        file.write("\n")
 
-    f.write(line)
-    f.write("\n")
+    file.write(line)
+    file.write("\n")
 
-    f.close()
+    file.close()
     print("[+] ¡¡¡ SUCCESSFULLY line write!!! [+]")
     print("")
     print("")
@@ -75,12 +74,14 @@ def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-    ts=args.exec_ts
+    ts=args.exec_ts  # Ejecución en supercomputador
 
     instantIni = datetime.now()
 
     root_path = '../data/'
     root_path_output = '../results/' + str(ts) + '/'
+ #   root_path = './data/'
+ #   root_path_output = './results/'
 
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
@@ -102,8 +103,7 @@ def main(args):
     # Feature selection
     d = (df_vars.groupby('repeticion').groups[rep]) & (df_vars.groupby('caja.de.test').groups[kfold])
 
-    print("rep: ", rep)
-    print("kfold: ", kfold)
+
 
     size = df_vars.shape[1]
     f = ['']
@@ -131,14 +131,15 @@ def main(args):
     # Data TRAIN and LABEL
     X_train = X.drop(X.index[rows_fold])
     y_train = y.drop(y.index[rows_fold])
-    y_train = label_binarize(y_train, classes=[0, 1, 2, 3, 4, 5, 6])
+    y_train_bina = label_binarize(y_train, classes=[0, 1, 2, 3, 4, 5, 6])
 
     # Data TEST and LABEL
     X_test = X.drop(X.index[No_rows_fold])
     y_test = y.drop(y.index[No_rows_fold])
-    y_test = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6])
+    y_test_bina = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6])
 
-    n_classes = y_train.shape[1]
+    n_classes = y_train_bina.shape[1]
+
 
     # Data normalization
 
@@ -158,8 +159,7 @@ def main(args):
     print("[+] Calculating hyperparameters for the classifier " + title + "[+]")
     print("")
     if model == 'rf':
-        parameters = {'random_state': [0], 'n_estimators': [1, 10], 'criterion': ('gini', 'entropy'),
-                      'max_depth': (1, 30)}
+        parameters = {'random_state': [0], 'n_estimators': [1, 10], 'criterion': ('gini', 'entropy'), 'max_depth': (1, 30)}
         model_grid = RandomForestClassifier()
     elif model == 'lr':
         # parameters = {'random_state':[0], 'C':[1,5,10,100], 'solver':('liblinear', 'lbfgs'), 'multi_class':('auto', 'ovr')}
@@ -217,43 +217,33 @@ def main(args):
     print("[+] Training models " + "[+]")
 
     print("[+] MODEL TRAINING " + model + "\n")
-    tmodel.fit(X_train_scaled, y_train)
+    tmodel.fit(X_train_scaled, y_train_bina)
     print("")
     print("[+] MODEL PREDICTING " + model + "\n")
     predictions = tmodel.predict(X_test_scaled)
     print("")
     print("[+] CLASSIFICATION REPORT " + model + "\n")
-    h = classification_report(y_test, predictions, output_dict=True, target_names=['Background', 'Dos', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscam', 'Spam'])
-    print(classification_report(y_test, predictions, target_names=['Background', 'Dos', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscam', 'Spam']))
+    h = classification_report(y_test_bina, predictions, output_dict=True, target_names=['Background', 'DoS', 'Botnet', 'Scan', 'SSHscan', 'UDPscan', 'Spam'])
+    print(classification_report(y_test_bina, predictions, target_names=['Background', 'DoS', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscan', 'Spam']))
     print("")
-
-    # Store Classification Report into 'dict'
-    result = defaultdict(list)
-    for fr in h.values():
-        if isinstance(fr, float):
-            print("")
-        else:
-            for k, v in fr.items():
-                result[k].append(v)
-
-        # Store keys and values
-    k = list(result.keys())
-    v = list(result.values())
 
     # Compute ROC area for each class
     fpr = dict()
     tpr = dict()
     roc_auc = dict()
+
     for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(y_test[:, i], predictions[:, i])
+        fpr[i], tpr[i], _ = roc_curve(y_test_bina[:, i], predictions[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
 
         # Compute ROC area weighted
     supports_sum = 0
     auc_partial = 0
-    for i in range(n_classes):
-        supports_sum = supports_sum + (v[3][i])
-        auc_partial = auc_partial + ((v[3][i]) * roc_auc[i])
+    cla = ['Background', 'DoS', 'Botnet', 'Scan', 'SSHscan', 'UDPscan', 'Spam']
+    cla2=len(cla)
+    for i in range(cla2):
+        supports_sum = supports_sum + (h[cla[i]]['support'])
+        auc_partial = auc_partial + ((h[cla[i]]['support']) * roc_auc[i])
     auc_w = auc_partial / supports_sum
 
     print("SUM SUPPORTS: ", supports_sum)
@@ -267,28 +257,37 @@ def main(args):
     time = instantFinal - instantIni
     path_param_output = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".csv"
     path_param_output_json_fpr = root_path_output + "FPR_" + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
-    path_param_output_json_tpr = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
+    path_param_output_json_tpr = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(    kfold) + "_" + "output" + ".json"
 
-    line = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(v[0][0]) + ',' + str(v[1][0]) + ',' + str(v[2][0]) + ',' + str(v[3][0]) + ',' + str(roc_auc[0]) + ',' + str(v[0][1]) + ',' + str(v[1][1]) + ',' + str(v[2][1]) + ',' + str(v[3][1]) + ',' + str(roc_auc[1]) + ',' + str(v[0][2]) + ',' + str(v[1][2]) + ',' + str(v[2][2]) + ',' + str(v[3][2]) + ',' + str(roc_auc[2]) + ',' + str(v[0][3]) + ',' + str(v[1][3]) + ',' + str(v[2][3]) + ',' + str(v[3][3]) + ',' + str(roc_auc[3]) + ',' + str(v[0][4]) + ',' + str(v[1][4]) + ',' + str(v[2][4]) + ',' + str(v[3][4]) + ',' + str(roc_auc[4]) + ',' + str(v[0][5]) + ',' + str(v[1][5]) + ',' + str(v[2][5]) + ',' + str(v[3][5]) + ',' + str(roc_auc[5]) + ',' + str(v[0][6]) + ',' + str(v[1][6]) + ',' + str(v[2][6]) + ',' + str(v[3][6]) + ',' + str(roc_auc[6]) + ',' + str(v[0][9]) + ',' + str(v[1][9]) + ',' + str(v[2][9]) + ',' + str(v[3][9]) + ',' + str(auc_w) + ',' + str(time)
+    line = str(rep) + ',' + str(kfold) + ',' + str(len(f)) + ',' + str(h['Background']['precision']) + ',' + str(h['Background']['recall']) + ',' + str(h['Background']['f1-score']) + ',' + str(h['Background']['support']) + ',' + str(roc_auc[0]) + ',' + str(h['DoS']['precision']) + ',' + str(h['DoS']['recall']) + ',' + str(h['DoS']['f1-score']) + ',' + str(h['DoS']['support']) + ',' + str(roc_auc[1]) + ',' + str(h['Botnet']['precision']) + ',' + str(h['Botnet']['recall']) + ',' + str(h['Botnet']['f1-score']) + ',' + str(h['Botnet']['support']) + ',' + str(roc_auc[2]) + ',' + str(h['Scan']['precision']) + ',' + str(h['Scan']['recall']) + ',' + str(h['Scan']['f1-score']) + ',' + str(h['Scan']['support']) + ',' + str(roc_auc[3]) + ',' + str(h['SSHscan']['precision']) + ',' + str(h['SSHscan']['recall']) + ',' + str(h['SSHscan']['f1-score']) + ',' + str(h['SSHscan']['support']) + ',' + str(roc_auc[4]) + ',' + str(h['UDPscan']['precision']) + ',' + str(h['UDPscan']['recall']) + ',' + str(h['UDPscan']['f1-score']) + ',' + str(h['UDPscan']['support']) + ',' + str(roc_auc[5]) + ',' + str(h['Spam']['precision']) + ',' + str(h['Spam']['recall']) + ',' + str(h['Spam']['f1-score']) + ',' + str(h['Spam']['support']) + ',' + str(roc_auc[6]) + ',' + str(h['weighted avg']['precision']) + ',' + str(h['weighted avg']['recall']) + ',' + str(h['weighted avg']['f1-score']) + ',' + str(h['weighted avg']['support']) + ',' + str(auc_w) + ',' + str(time)
     header = "Rep." + "," + "Kfold" + "," + "Num. Vars." + "," + "Precision-Background" + "," + "Recall-Background" + "," + "F1_score_Background" + "," + "Num. Obs. Background" + "," + "AUC_Background" + "," + "Precision-DoS" + "," + "Recall-DoS" + "," + "F1_score_DoS" + "," + "Num. Obs. Dos" + "," + "AUC_DoS" + "," "Precision-Botnet" + "," + "Recall-Botnet" + "," + "F1_score_Botnet" + "," + "Num. Obs. Botnet" + "," + "AUC_Botnet" + "," + "Precision-Scan" + "," + "Recall-Scan" + "," + "F1_score_Scan" + "," + "Num. Obs. Scan" + "," + "AUC_Scan" + "," + "Precision-SSHscan" + "," + "Recall-SSHscan" + "," + "F1_score_SSHscan" + "," + "Num. Obs. SSHscan" + "," + "AUC_SSHscan" + "," + "Precision-UDPscan" + "," + "Recall-UDPscan" + "," + "F1_score_UDPscan" + "," + "Num. Obs. UDPscan" + "," + "AUC_UDPscan" + "," + "Precision-Spam" + "," + "Recall-Spam" + "," + "F1_score_Spam" + "," + "Num. Obs. Spam" + "," + "AUC_Spam" + "," + "Precision-w" + "," + "Recall-w" + "," + "F1_score_w" + "," + "Total Obs." + "," + "AUC_w" + "," + "Time"
 
     write_param(path_param_output, line, header)
 
     # Send data to .json
+    names = []
+    names.append('Background')
+    names.append('DoS')
+    names.append('Botnet')
+    names.append('Scan')
+    names.append('SSHscan')
+    names.append('UDPscan')
+    names.append('Spam')
+
     with open(path_param_output_json_fpr, "w") as fpr_dict:
-        for nombre, valor in fpr.items():
-            fpr_dict.write("%s %s\n" % (nombre, valor))
+        for name, value in fpr.items():
+            fpr_dict.write("%s %s\n" % (names[int(name)], value))
         print("---FPR WRITED---")
 
     with open(path_param_output_json_tpr, "w") as tpr_dict:
-        for nombre, valor in tpr.items():
-            tpr_dict.write("%s %s\n" % (nombre, valor))
+        for name, value in tpr.items():
+            tpr_dict.write("%s %s\n" % (names[int(name)], value))
         print("---TPR WRITED---")
 
     print("------------------")
-    print(" [+] REP: ---" + str(rep) + "---" + " Kfold: " + "---" +  str(kfold) + "--- Model: ---" + title + "---" + " ¡¡TERMINATED!! [+]")
+    print(" [+] Time Stamp: ---" + " REP: ---" + str(rep) + "---" + " Kfold: " + "---" + str(kfold) + "--- Model: ---" + title + "---" + " ¡¡TERMINATED!! [+]")
     print("------------------")
-    print("Time elapsed: ", time)
+    print("Elapsed time: ", time)
 
 if __name__ == "__main__":
     args = getArguments()
