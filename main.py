@@ -13,14 +13,15 @@
 import argparse
 import pandas as pd
 import os
+import numpy as np
 from sklearn.preprocessing import StandardScaler
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, roc_auc_score, auc
 from sklearn.metrics import classification_report
 from datetime import datetime
-
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import label_binarize
 import json
@@ -48,7 +49,7 @@ def getArguments():
     parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
     parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
+ #   parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
     args = parser.parse_args()
     return args
 
@@ -74,14 +75,14 @@ def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-    ts=args.exec_ts  # Ejecución en supercomputador
+#    ts=args.exec_ts  # Ejecución en supercomputador
 
     instantIni = datetime.now()
 
-    root_path = '../data/'
-    root_path_output = '../results/' + str(ts) + '/'
- #   root_path = './data/'
- #   root_path_output = './results/'
+ #   root_path = '../data/'
+ #   root_path_output = '../results/' + str(ts) + '/'
+    root_path = './data/'
+    root_path_output = './results/'
 
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
@@ -162,8 +163,8 @@ def main(args):
         parameters = {'random_state': [0], 'n_estimators': [1, 10], 'criterion': ('gini', 'entropy'), 'max_depth': (1, 30)}
         model_grid = RandomForestClassifier()
     elif model == 'lr':
-        # parameters = {'random_state':[0], 'C':[1,5,10,100], 'solver':('liblinear', 'lbfgs'), 'multi_class':('auto', 'ovr')}
-        parameters = {'random_state': [0], 'C': [1, 2], 'solver': ('liblinear', 'lbfgs'), 'multi_class': ('auto', 'ovr')}
+        parameters = {'random_state':[0], 'C':[1,5,10,100], 'solver':('liblinear', 'lbfgs'), 'multi_class':('auto', 'ovr')}
+      #  parameters = {'random_state': [0], 'C': [1, 2], 'solver': ('liblinear', 'lbfgs'), 'multi_class': ('auto', 'ovr')}
         model_grid = LogisticRegression()
     elif model == 'svc':
         parameters = {'gamma': [0.001, 0.01, 0.1, 1], 'C': [0.001, 0.01, 0.1, 1, 10, 100]}
@@ -179,8 +180,7 @@ def main(args):
 
     # Save selected parameters to .json
 
-    path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(
-        kfold) + "_" + "output" + ".json"
+    path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
     with open(path_param_output_json_bp, "w") as fi:
         json.dump(bp, fi)
 
@@ -214,14 +214,22 @@ def main(args):
         tmodel = SVC(random_state=0, kernel='rbf', gamma=ga, C=cs, verbose=verbose)
 
     # Training models
-    print("[+] Training models " + "[+]")
+    print("[+] TRAINING MODELS " + "[+]")
+    print("")
+    print("[+] Model Training: " + title + "\n")
+    if model == "lr" or model == "svc":
+        tmodeldef = OneVsRestClassifier(tmodel)
+    else:
+        tmodeldef = tmodel
 
-    print("[+] MODEL TRAINING " + model + "\n")
-    tmodel.fit(X_train_scaled, y_train_bina)
+    tmodeldef.fit(X_train_scaled, y_train_bina)
     print("")
     print("[+] MODEL PREDICTING " + model + "\n")
-    predictions = tmodel.predict(X_test_scaled)
+    predictions = tmodeldef.predict(X_test_scaled)
     print("")
+
+
+
     print("[+] CLASSIFICATION REPORT " + model + "\n")
     h = classification_report(y_test_bina, predictions, output_dict=True, target_names=['Background', 'DoS', 'Botnet', 'Scan', 'SSHscan', 'UDPscan', 'Spam'])
     print(classification_report(y_test_bina, predictions, target_names=['Background', 'DoS', 'Nerisbotnet', 'Scan', 'SSHscan', 'UDPscan', 'Spam']))
