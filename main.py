@@ -49,7 +49,7 @@ def getArguments():
     parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
     parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
+ #   parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
     args = parser.parse_args()
     return args
 
@@ -75,13 +75,14 @@ def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-    ts=args.exec_ts  # Ejecución en supercomputador
+#    ts=args.exec_ts  # Ejecución en supercomputador
 
     instantIni = datetime.now()
 
-    root_path = '../data/'
-    root_path_output = '../results/' + str(ts) + '/'
-    
+ #   root_path = '../data/'
+ #   root_path_output = '../results/' + str(ts) + '/'
+    root_path = './data/'
+    root_path_output = './results/'
 
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
@@ -146,7 +147,6 @@ def main(args):
     X_train_scaled = StandardScaler().fit_transform(X_train)
     X_test_scaled = StandardScaler().fit_transform(X_test)
 
-
     # Hyperparameters Selection
 
     if model == 'lr':
@@ -156,55 +156,50 @@ def main(args):
     elif model == 'svc':
         title = 'SVC'
 
-    print("[+] Calculating hyperparameters for the classifier " + title + "[+]")
+    print("[+] Calculating hyperparameters for the classifier: " + title + "[+]")
     print("")
     if model == 'rf':
-        parameters = {'random_state': [0], 'n_estimators': [1, 10], 'criterion': ('gini', 'entropy'), 'max_depth': (1, 30)}
+        parameters = {'random_state': [0], 'n_estimators': [2, 4, 8, 16, 32], 'min_samples_split': [2], 'min_samples_leaf': [2], 'max_depth': (2, 4, 8, 16)}
         model_grid = RandomForestClassifier()
     elif model == 'lr':
-        parameters = {'random_state':[0], 'C':[1,5,10,100], 'solver':('liblinear', 'lbfgs'), 'multi_class':('auto', 'ovr')}
-      #  parameters = {'random_state': [0], 'C': [1, 2], 'solver': ('liblinear', 'lbfgs'), 'multi_class': ('auto', 'ovr')}
+        parameters = {'random_state': [0], 'penalty': ['none'], 'solver': ['lbfgs'], 'multi_class': ['auto']}
         model_grid = LogisticRegression()
     elif model == 'svc':
-        parameters = {'gamma': [0.001, 0.01, 0.1, 1], 'C': [0.001, 0.01, 0.1, 1, 10, 100]}
+        parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100], 'kernel': ['rbf']}
         model_grid = SVC()
+    if model != 'lr':
+        clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
+        clf.fit(X_train_scaled, y_train)
+        print("")
+        print("[+] The best parameters for " + "Rep.: " + str(rep) + " and Kfold: " + str(kfold) + " are:  [+]")
+        print(str(clf.best_params_))
+        print("")
+        bp = clf.best_params_
 
-    clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
-    clf.fit(X_train_scaled, y_train)
-    print("")
-    print("[+] The best parameters for " + "Rep.: " + str(rep) + " and Kfold: " + str(kfold) + " are:  [+]")
-    print(str(clf.best_params_))
-    print("")
-    bp = clf.best_params_
+        # Save selected parameters to .json
 
-    # Save selected parameters to .json
+        path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(
+            kfold) + "_" + "output" + ".json"
+        with open(path_param_output_json_bp, "w") as fi:
+            json.dump(bp, fi)
 
-    path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
-    with open(path_param_output_json_bp, "w") as fi:
-        json.dump(bp, fi)
-
-    print("---BEST PARAMETERS WRITED---")
-
+        print("---BEST PARAMETERS WRITED---")
 
     # PARAMETERS SELECTED
+
     print("[+] PARAMETERS SELECTED MODEL " + title + " [+]")
     print("")
     if model == 'rf':
-        cr = str(bp.get('criterion'))
-        print("Criterion: ", cr)
         md = int(bp.get('max_depth'))
         print("Max_Depth: ", md)
         nit = int(bp.get('n_estimators'))
         print("N_Estimators: ", nit)
-        tmodel = RandomForestClassifier(criterion=cr, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
+        tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
     elif model == 'lr':
-        cs = int(bp.get('C'))
-        print("cs: ", cs)
-        solv = str(bp.get('solver'))
-        print("solv: ", solv)
-        mc = str(bp.get('multi_class'))
-        print("mc: ", mc)
-        tmodel = LogisticRegression(random_state=0, C=cs, solver=solv, multi_class=mc, verbose=verbose)
+        print("Solver: lbfgs")
+        print("Multi_class: auto")
+        print("Penalty: none")
+        tmodel = LogisticRegression(random_state=0, penalty='none', multi_class='auto', solver='lbfgs', verbose=verbose)
     elif model == 'svc':
         cs = int(bp.get('C'))
         print("cs: ", cs)
