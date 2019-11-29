@@ -54,7 +54,8 @@ do
     for ((k=$OUTFOLD_START; k<=$OUTFOLD_END; k++))
     do
 	echo "[-] Running task for model: $model, rep: $r, k-fold: $k"
-        sbatch $FLAGS --wrap="python ../main.py $model $r $k $exec_ts"
+        #sbatch $FLAGS --wrap="python ../main.py $model $r $k $exec_ts"
+        python ../main.py $model $r $k $exec_ts &> $model\_$r\_$k\_$exec_ts.log &
         TOTAL=`expr $TOTAL + 1`
         sleep 2s
     done
