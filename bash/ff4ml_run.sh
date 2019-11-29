@@ -55,7 +55,7 @@ do
     do
 	echo "[-] Running task for model: $model, rep: $r, k-fold: $k"
         #sbatch $FLAGS --wrap="python ../main.py $model $r $k $exec_ts"
-        python ../main.py $model $r $k $exec_ts &> $model\_$r\_$k\_$exec_ts.log &
+        python ../main.py $model $r $k $exec_ts
         TOTAL=`expr $TOTAL + 1`
         sleep 2s
     done

@@ -152,12 +152,12 @@ def main(args):
     print("[+] Calculating hyper-parameters for the classifier: " + title + " ...")
     print("")
     if model == 'rf':
-        parameters = {'estimator__n_estimators': [2, 4, 8, 16, 32], 'estimator__max_depth': (2, 4, 8, 16)}
-        model_grid = OneVsRestClassifier(RandomForestClassifier())
+        parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
+        model_grid = RandomForestClassifier(random_state=0, min_samples_split=2, min_samples_leaf=2)
     elif model == 'svc':
-        parameters = {'estimator__gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1],
-                      'estimator__C': [0.1, 1, 10, 100]}
-        model_grid = OneVsRestClassifier(SVC())
+        parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
+
+        model_grid = SVC(random_state=0, kernel='rbf')
 
     if model != 'lr':
         clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
@@ -182,9 +182,9 @@ def main(args):
     print("[+] PARAMETERS SELECTED MODEL " + title + " [+]")
     print("")
     if model == 'rf':
-        md = int(bp.get('estimator__max_depth'))
+        md = int(bp.get('max_depth'))
         print("Max_Depth: ", md)
-        nit = int(bp.get('estimator__n_estimators'))
+        nit = int(bp.get('n_estimators'))
         print("N_Estimators: ", nit)
         tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md,
                                         random_state=0, n_estimators=nit, verbose=verbose)
@@ -195,9 +195,9 @@ def main(args):
         tmodel = LogisticRegression(random_state=0, penalty='none', multi_class='auto',
                                     solver='lbfgs', verbose=verbose)
     elif model == 'svc':
-        cs = int(bp.get('estimator__C'))
+        cs = int(bp.get('C'))
         print("cs: ", cs)
-        ga = float(bp.get('estimator__gamma'))
+        ga = float(bp.get('gamma'))
         print("ga: ", ga)
         tmodel = SVC(random_state=0, kernel='rbf', gamma=ga, C=cs, verbose=verbose)
 
