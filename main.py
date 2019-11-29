@@ -75,6 +75,7 @@ def write_param(path_param, line, header):
     file.close()
     print("[+] Line added ...")
 
+
 def main(args):
     model=args.model
     rep=args.rep
@@ -83,8 +84,8 @@ def main(args):
 
     instantIni = datetime.now()
 
-    root_path = '../data/'
-    root_path_output = '../results/' + str(ts) + '/'
+    root_path = './data/'
+    root_path_output = './results/' + str(ts) + '/'
     
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
