@@ -55,6 +55,7 @@ def start_experiment(args):
     model = args.model
 
     exec_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    start_time = datetime.now()
 
     print("[+] Start experiment from model={0}, reps={1} and kfolds={2} at {3}"
           .format(model, reps, kfolds, exec_ts))
@@ -94,6 +95,10 @@ def start_experiment(args):
 
         print("[-] # of pending task = {0}".format(ntasks))
         time.sleep(2)
+
+    end_time = datetime.now()
+    elapsed_time = end_time - start_time
+    print("[+] Finished. Elapsed time {0}".format(elapsed_time))
 
 
 if __name__ == "__main__":
