@@ -40,7 +40,7 @@ def run_external(model, rep, kfold, exec_ts):
               " " + str(kfold) + \
               " " + exec_ts
 
-    os.mkdir("./results/" + exec_ts)
+    sp.Popen(shlex.split("mkdir -p ./results/" + exec_ts))
 
     print("[-] Launching {0}".format(command))
     p = sp.call(shlex.split(command))
@@ -54,8 +54,10 @@ def start_experiment(args):
     reps = args.rep
     model = args.model
 
-    print("[+] Start experiment from model={0}, reps={1} and kfolds={2}"
-          .format(model, reps, kfolds))
+    exec_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    print("[+] Start experiment from model={0}, reps={1} and kfolds={2} at {3}"
+          .format(model, reps, kfolds, exec_ts))
 
     cores = mp.cpu_count()
     print("[+] Available cores = {0}".format(cores))
@@ -63,21 +65,27 @@ def start_experiment(args):
     procs = []
     end = False
 
-    ntasks = reps * kfolds
+    # Creating list of tasks
+    task_queue = [(rep, kfold) for rep in range(1, reps + 1, 1) for kfold in range(1, kfolds + 1, 1)]
+    ntasks = len(task_queue)
     print("[+] # total tasks = {0}".format(ntasks))
 
     while ntasks > 0:
 
         if len(procs) < min(cores, ntasks):
-            exec_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            # Getting the task
+            current_task = task_queue[0]
+            del task_queue[0]
             proc = mp.Process(target=run_external, args=(args.model,
-                                                         args.rep,
-                                                         args.kfold,
+                                                         current_task[0], # Repetition
+                                                         current_task[1], # Fold
                                                          exec_ts))
             procs.append(proc)
             proc.start()
-            print("[-] Starting task at {0}".format(exec_ts))
-            print("[-] There are {0} simultaneous tasks running".format(len(procs)))
+            print("[-] Starting task (rep, kfold) = {0} at {1}"
+                  .format(current_task, datetime.now().strftime("%Y%m%d_%H%M%S")))
+
+        print("[-] There are {0} simultaneous tasks running".format(len(procs)))
 
         for i, p in enumerate(procs):
             if not p.is_alive():
