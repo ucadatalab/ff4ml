@@ -84,8 +84,10 @@ def main(args):
 
     instantIni = datetime.now()
 
-    root_path = './data/'
-    root_path_output = './results/' + str(ts) + '/'
+#    root_path = './data/'
+#    root_path_output = './results/' + str(ts) + '/'
+    root_path = '../data/' # Ejecución en supercomputador
+    root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
     
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
@@ -343,6 +345,18 @@ def main(args):
     write_param(path_param_output, line, header)
 
     # Send data to .json
+
+    names = []
+    names.append('Background')
+    names.append('DoS')
+    names.append('Botnet')
+    names.append('Scan')
+    names.append('SSHscan')
+    names.append('UDPscan')
+    names.append('Spam')
+
+
+
     with open(path_param_output_json_fpr, "w") as fpr_dict:
         for name, value in fpr.items():
             fpr_dict.write("%s %s\n" % (labels[int(name)], value))
