@@ -56,7 +56,7 @@ def getArguments():
     parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
     parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
+   # parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
 
     return parser.parse_args()
 
@@ -80,14 +80,14 @@ def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-    ts=args.exec_ts  # Ejecución en supercomputador
+  #  ts=args.exec_ts  # Ejecución en supercomputador
 
     instantIni = datetime.now()
 
-#    root_path = './data/'
-#    root_path_output = './results/' + str(ts) + '/'
-    root_path = '../data/' # Ejecución en supercomputador
-    root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
+    root_path = './data/'
+    root_path_output = './results/'
+  #  root_path = '../data/' # Ejecución en supercomputador
+   # root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
     
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
@@ -214,43 +214,80 @@ def main(args):
     tmodeldef.fit(X_train_scaled, y_train_bina)
     print("")
     print("[+] MODEL PREDICTING " + model + "\n")
-    predictions = tmodeldef.predict(X_test_scaled)
+    predictions_test = tmodeldef.predict(X_test_scaled)
+    predictions_train = tmodeldef.predict(X_train_scaled)
     print("")
 
-    print("[+] CLASSIFICATION REPORT " + model + "\n")
-    h = classification_report(y_test_bina, predictions, output_dict=True, target_names=labels)
-    print(classification_report(y_test_bina, predictions, target_names=labels))
+    print("[+] CLASSIFICATION REPORT TEST " + model + "\n")
+    clasif_test = classification_report(y_test_bina, predictions_test, output_dict=True, target_names=labels)
+    print(classification_report(y_test_bina, predictions_test, target_names=labels))
+    print("")
+    print("[+] CLASSIFICATION REPORT TRAIN " + model + "\n")
+    clasif_train = classification_report(y_train_bina, predictions_train, output_dict=True, target_names=labels)
+    print(classification_report(y_train_bina, predictions_train, target_names=labels))
     print("")
 
-    # Compute ROC area for each class
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
+    # Compute ROC area for each class TEST
+    fpr_test = dict()
+    tpr_test = dict()
+    roc_auc_test = dict()
 
     for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(y_test_bina[:, i], predictions[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
+        fpr_test[i], tpr_test[i], _ = roc_curve(y_test_bina[:, i], predictions_test[:, i])
+        roc_auc_test[i] = auc(fpr_test[i], tpr_test[i])
 
     # Compute per class ROCs and AUCs
-    supports_sum = 0
-    auc_partial = 0
+    supports_sum_test = 0
+    auc_partial_test = 0
 
     for i in range(len(labels)):
-        supports_sum = supports_sum + (h[labels[i]]['support'])
-        auc_partial = auc_partial + ((h[labels[i]]['support']) * roc_auc[i])
-    auc_w = auc_partial / supports_sum
+        supports_sum_test = supports_sum_test + (clasif_test[labels[i]]['support'])
+        auc_partial_test = auc_partial_test + ((clasif_test[labels[i]]['support']) * roc_auc_test[i])
+    auc_w_test = auc_partial_test / supports_sum_test
 
-    print("SUM SUPPORTS: ", supports_sum)
-    print("AUC_W: ", auc_w)
+    print("SUM SUPPORTS TEST: ", supports_sum_test)
+    print("AUC_W TEST: ", auc_w_test)
+    print("")
+
+    # Compute ROC area for each class TRAIN
+    fpr_train = dict()
+    tpr_train = dict()
+    roc_auc_train = dict()
+
+    for i in range(n_classes):
+        fpr_train[i], tpr_train[i], _ = roc_curve(y_train_bina[:, i], predictions_train[:, i])
+        roc_auc_train[i] = auc(fpr_train[i], tpr_train[i])
+
+    # Compute per class ROCs and AUCs
+    supports_sum_train = 0
+    auc_partial_train = 0
+
+    for i in range(len(labels)):
+        supports_sum_train = supports_sum_train + (clasif_train[labels[i]]['support'])
+        auc_partial_train = auc_partial_train + ((clasif_train[labels[i]]['support']) * roc_auc_train[i])
+    auc_w_train = auc_partial_train / supports_sum_train
+
+    print("SUM SUPPORTS TRAIN: ", supports_sum_train)
+    print("AUC_W TRAIN: ", auc_w_train)
     print("")
 
     # Send data to .csv
 
     instantFinal = datetime.now()
     time = instantFinal - instantIni
-    path_param_output = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".csv"
-    path_param_output_json_fpr = root_path_output + "FPR_" + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
-    path_param_output_json_tpr = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output" + ".json"
+    path_param_output_test = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output_test" + ".csv"
+    path_param_output_train = root_path_output + model + "_" + str(rep) + "_" + str(
+        kfold) + "_" + "output_train" + ".csv"
+
+    path_param_output_json_fpr_test = root_path_output + "FPR_" + model + "_" + str(rep) + "_" + str(
+        kfold) + "_" + "output_test" + ".json"
+    path_param_output_json_tpr_test = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(
+        kfold) + "_" + "output_test" + ".json"
+
+    path_param_output_json_fpr_train = root_path_output + "FPR_" + model + "_" + str(rep) + "_" + str(
+        kfold) + "_" + "output_train" + ".json"
+    path_param_output_json_tpr_train = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(
+        kfold) + "_" + "output_train" + ".json"
 
     header = "Rep." + \
              "," + "Kfold" + \
@@ -297,52 +334,98 @@ def main(args):
              "," + "AUC_w" + \
              "," + "Time"
 
-    line = str(rep) + \
-           ',' + str(kfold) + \
-           ',' + str(len(f)) + \
-           ',' + str(h['background']['precision']) + \
-           ',' + str(h['background']['recall']) + \
-           ',' + str(h['background']['f1-score']) + \
-           ',' + str(h['background']['support']) + \
-           ',' + str(roc_auc[0]) + \
-           ',' + str(h['dos']['precision']) + \
-           ',' + str(h['dos']['recall']) + \
-           ',' + str(h['dos']['f1-score']) + \
-           ',' + str(h['dos']['support']) + \
-           ',' + str(roc_auc[1]) + \
-           ',' + str(h['nerisbotnet']['precision']) + \
-           ',' + str(h['nerisbotnet']['recall']) + \
-           ',' + str(h['nerisbotnet']['f1-score']) + \
-           ',' + str(h['nerisbotnet']['support']) + \
-           ',' + str(roc_auc[2]) + \
-           ',' + str(h['scan']['precision']) + \
-           ',' + str(h['scan']['recall']) + \
-           ',' + str(h['scan']['f1-score']) + \
-           ',' + str(h['scan']['support']) + \
-           ',' + str(roc_auc[3]) + \
-           ',' + str(h['sshscan']['precision']) + \
-           ',' + str(h['sshscan']['recall']) + \
-           ',' + str(h['sshscan']['f1-score']) + \
-           ',' + str(h['sshscan']['support']) + \
-           ',' + str(roc_auc[4]) + \
-           ',' + str(h['udpscan']['precision']) + \
-           ',' + str(h['udpscan']['recall']) + \
-           ',' + str(h['udpscan']['f1-score']) + \
-           ',' + str(h['udpscan']['support']) + \
-           ',' + str(roc_auc[5]) + \
-           ',' + str(h['spam']['precision']) + \
-           ',' + str(h['spam']['recall']) + \
-           ',' + str(h['spam']['f1-score']) + \
-           ',' + str(h['spam']['support']) + \
-           ',' + str(roc_auc[6]) + \
-           ',' + str(h['weighted avg']['precision']) + \
-           ',' + str(h['weighted avg']['recall']) + \
-           ',' + str(h['weighted avg']['f1-score']) + \
-           ',' + str(h['weighted avg']['support']) + \
-           ',' + str(auc_w) + \
-           ',' + str(time)
+    line_test = str(rep) + \
+                ',' + str(kfold) + \
+                ',' + str(len(f)) + \
+                ',' + str(clasif_test['background']['precision']) + \
+                ',' + str(clasif_test['background']['recall']) + \
+                ',' + str(clasif_test['background']['f1-score']) + \
+                ',' + str(clasif_test['background']['support']) + \
+                ',' + str(roc_auc_test[0]) + \
+                ',' + str(clasif_test['dos']['precision']) + \
+                ',' + str(clasif_test['dos']['recall']) + \
+                ',' + str(clasif_test['dos']['f1-score']) + \
+                ',' + str(clasif_test['dos']['support']) + \
+                ',' + str(roc_auc_test[1]) + \
+                ',' + str(clasif_test['nerisbotnet']['precision']) + \
+                ',' + str(clasif_test['nerisbotnet']['recall']) + \
+                ',' + str(clasif_test['nerisbotnet']['f1-score']) + \
+                ',' + str(clasif_test['nerisbotnet']['support']) + \
+                ',' + str(roc_auc_test[2]) + \
+                ',' + str(clasif_test['scan']['precision']) + \
+                ',' + str(clasif_test['scan']['recall']) + \
+                ',' + str(clasif_test['scan']['f1-score']) + \
+                ',' + str(clasif_test['scan']['support']) + \
+                ',' + str(roc_auc_test[3]) + \
+                ',' + str(clasif_test['sshscan']['precision']) + \
+                ',' + str(clasif_test['sshscan']['recall']) + \
+                ',' + str(clasif_test['sshscan']['f1-score']) + \
+                ',' + str(clasif_test['sshscan']['support']) + \
+                ',' + str(roc_auc_test[4]) + \
+                ',' + str(clasif_test['udpscan']['precision']) + \
+                ',' + str(clasif_test['udpscan']['recall']) + \
+                ',' + str(clasif_test['udpscan']['f1-score']) + \
+                ',' + str(clasif_test['udpscan']['support']) + \
+                ',' + str(roc_auc_test[5]) + \
+                ',' + str(clasif_test['spam']['precision']) + \
+                ',' + str(clasif_test['spam']['recall']) + \
+                ',' + str(clasif_test['spam']['f1-score']) + \
+                ',' + str(clasif_test['spam']['support']) + \
+                ',' + str(roc_auc_test[6]) + \
+                ',' + str(clasif_test['weighted avg']['precision']) + \
+                ',' + str(clasif_test['weighted avg']['recall']) + \
+                ',' + str(clasif_test['weighted avg']['f1-score']) + \
+                ',' + str(clasif_test['weighted avg']['support']) + \
+                ',' + str(auc_w_test) + \
+                ',' + str(time)
 
-    write_param(path_param_output, line, header)
+    line_train = str(rep) + \
+                 ',' + str(kfold) + \
+                 ',' + str(len(f)) + \
+                 ',' + str(clasif_train['background']['precision']) + \
+                 ',' + str(clasif_train['background']['recall']) + \
+                 ',' + str(clasif_train['background']['f1-score']) + \
+                 ',' + str(clasif_train['background']['support']) + \
+                 ',' + str(roc_auc_train[0]) + \
+                 ',' + str(clasif_train['dos']['precision']) + \
+                 ',' + str(clasif_train['dos']['recall']) + \
+                 ',' + str(clasif_train['dos']['f1-score']) + \
+                 ',' + str(clasif_train['dos']['support']) + \
+                 ',' + str(roc_auc_train[1]) + \
+                 ',' + str(clasif_train['nerisbotnet']['precision']) + \
+                 ',' + str(clasif_train['nerisbotnet']['recall']) + \
+                 ',' + str(clasif_train['nerisbotnet']['f1-score']) + \
+                 ',' + str(clasif_train['nerisbotnet']['support']) + \
+                 ',' + str(roc_auc_train[2]) + \
+                 ',' + str(clasif_train['scan']['precision']) + \
+                 ',' + str(clasif_train['scan']['recall']) + \
+                 ',' + str(clasif_train['scan']['f1-score']) + \
+                 ',' + str(clasif_train['scan']['support']) + \
+                 ',' + str(roc_auc_train[3]) + \
+                 ',' + str(clasif_train['sshscan']['precision']) + \
+                 ',' + str(clasif_train['sshscan']['recall']) + \
+                 ',' + str(clasif_train['sshscan']['f1-score']) + \
+                 ',' + str(clasif_train['sshscan']['support']) + \
+                 ',' + str(roc_auc_train[4]) + \
+                 ',' + str(clasif_train['udpscan']['precision']) + \
+                 ',' + str(clasif_train['udpscan']['recall']) + \
+                 ',' + str(clasif_train['udpscan']['f1-score']) + \
+                 ',' + str(clasif_train['udpscan']['support']) + \
+                 ',' + str(roc_auc_train[5]) + \
+                 ',' + str(clasif_train['spam']['precision']) + \
+                 ',' + str(clasif_train['spam']['recall']) + \
+                 ',' + str(clasif_train['spam']['f1-score']) + \
+                 ',' + str(clasif_train['spam']['support']) + \
+                 ',' + str(roc_auc_train[6]) + \
+                 ',' + str(clasif_train['weighted avg']['precision']) + \
+                 ',' + str(clasif_train['weighted avg']['recall']) + \
+                 ',' + str(clasif_train['weighted avg']['f1-score']) + \
+                 ',' + str(clasif_train['weighted avg']['support']) + \
+                 ',' + str(auc_w_train) + \
+                 ',' + str(time)
+
+    write_param(path_param_output_test, line_test, header)
+    write_param(path_param_output_train, line_train, header)
 
     # Send data to .json
 
@@ -355,17 +438,25 @@ def main(args):
     names.append('UDPscan')
     names.append('Spam')
 
-
-
-    with open(path_param_output_json_fpr, "w") as fpr_dict:
-        for name, value in fpr.items():
+    with open(path_param_output_json_fpr_test, "w") as fpr_dict:
+        for name, value in fpr_test.items():
             fpr_dict.write("%s %s\n" % (labels[int(name)], value))
-        print("---FPR WRITTEN---")
+        print("---FPR TEST WRITTEN---")
 
-    with open(path_param_output_json_tpr, "w") as tpr_dict:
-        for name, value in tpr.items():
+    with open(path_param_output_json_tpr_test, "w") as tpr_dict:
+        for name, value in tpr_test.items():
             tpr_dict.write("%s %s\n" % (labels[int(name)], value))
-        print("---TPR WRITTEN---")
+        print("---TPR TEST WRITTEN---")
+
+    with open(path_param_output_json_fpr_train, "w") as fpr_dict:
+        for name, value in fpr_train.items():
+            fpr_dict.write("%s %s\n" % (labels[int(name)], value))
+        print("---FPR TRAIN WRITTEN---")
+
+    with open(path_param_output_json_tpr_train, "w") as tpr_dict:
+        for name, value in tpr_train.items():
+            tpr_dict.write("%s %s\n" % (labels[int(name)], value))
+        print("---TPR TRAIN WRITTEN---")
 
     print("------------------")
     print(" [+] Time Stamp: ---" +
