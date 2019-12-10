@@ -1,0 +1,74 @@
+[+] Reading datasets ...
+[-]ugr16_multiclass.csv OK
+[-]ugr16_multiclass_folds.csv OK
+[-]ugr16_multiclass_folds_selecvars.csv OK
+[+] Calculating hyper-parameters for the classifier: RANDOM FOREST ...
+
+
+[+] The best parameters for Rep.: 18 and Kfold: 2 are:  [+]
+{'max_features': 2, 'n_estimators': 500}
+
+---BEST PARAMETERS WRITED---
+[+] PARAMETERS SELECTED MODEL RANDOM FOREST [+]
+
+Max_Features:  2
+[+] TRAINING MODELS [+]
+
+[+] Model Training: RANDOM FOREST
+
+
+[+] MODEL PREDICTING rf
+
+
+[+] CLASSIFICATION REPORT TEST rf
+
+              precision    recall  f1-score   support
+
+  background       0.88      0.96      0.92      6018
+         dos       1.00      0.54      0.70        83
+ nerisbotnet       1.00      0.03      0.05       119
+        scan       1.00      0.83      0.91        35
+     sshscan       0.00      0.00      0.00         6
+     udpscan       0.00      0.00      0.00         2
+        spam       0.92      0.73      0.82      3191
+
+   micro avg       0.89      0.87      0.88      9454
+   macro avg       0.69      0.44      0.48      9454
+weighted avg       0.90      0.87      0.87      9454
+ samples avg       0.87      0.87      0.87      9454
+
+
+[+] CLASSIFICATION REPORT TRAIN rf
+
+              precision    recall  f1-score   support
+
+  background       1.00      1.00      1.00     24073
+         dos       1.00      1.00      1.00       334
+ nerisbotnet       1.00      1.00      1.00       475
+        scan       1.00      1.00      1.00       141
+     sshscan       1.00      1.00      1.00        21
+     udpscan       1.00      1.00      1.00         7
+        spam       1.00      1.00      1.00     12768
+
+   micro avg       1.00      1.00      1.00     37819
+   macro avg       1.00      1.00      1.00     37819
+weighted avg       1.00      1.00      1.00     37819
+ samples avg       1.00      1.00      1.00     37819
+
+
+SUM SUPPORTS TEST:  9454
+AUC_W TEST:  0.8540539806970964
+
+SUM SUPPORTS TRAIN:  37819
+AUC_W TRAIN:  1.0
+
+[+] Line added ...
+[+] Line added ...
+---FPR TEST WRITTEN---
+---TPR TEST WRITTEN---
+---FPR TRAIN WRITTEN---
+---TPR TRAIN WRITTEN---
+------------------
+ [+] Time Stamp: --- REP: ---18--- Kfold: ---2--- Model: ---RANDOM FOREST--- FINISHED! [+]
+------------------
+Elapsed time:  0:25:38.783623

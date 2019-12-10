@@ -1,0 +1,75 @@
+[+] Reading datasets ...
+[-]ugr16_multiclass.csv OK
+[-]ugr16_multiclass_folds.csv OK
+[-]ugr16_multiclass_folds_selecvars.csv OK
+[+] Calculating hyper-parameters for the classifier: SVC ...
+
+
+[+] The best parameters for Rep.: 10 and Kfold: 4 are:  [+]
+{'C': 10, 'gamma': 1}
+
+---BEST PARAMETERS WRITED---
+[+] PARAMETERS SELECTED MODEL SVC [+]
+
+cs:  10
+ga:  1.0
+[+] TRAINING MODELS [+]
+
+[+] Model Training: SVC
+
+
+[+] MODEL PREDICTING svc
+
+
+[+] CLASSIFICATION REPORT TEST svc
+
+              precision    recall  f1-score   support
+
+  background       0.64      1.00      0.78      6018
+         dos       0.00      0.00      0.00        84
+ nerisbotnet       0.00      0.00      0.00       119
+        scan       0.00      0.00      0.00        35
+     sshscan       0.00      0.00      0.00         6
+     udpscan       0.00      0.00      0.00         2
+        spam       0.00      0.00      0.00      3192
+
+   micro avg       0.64      0.64      0.64      9456
+   macro avg       0.09      0.14      0.11      9456
+weighted avg       0.41      0.64      0.50      9456
+ samples avg       0.64      0.64      0.64      9456
+
+
+[+] CLASSIFICATION REPORT TRAIN svc
+
+              precision    recall  f1-score   support
+
+  background       1.00      1.00      1.00     24073
+         dos       1.00      1.00      1.00       333
+ nerisbotnet       1.00      1.00      1.00       475
+        scan       1.00      1.00      1.00       141
+     sshscan       1.00      1.00      1.00        21
+     udpscan       1.00      1.00      1.00         7
+        spam       1.00      1.00      1.00     12767
+
+   micro avg       1.00      1.00      1.00     37817
+   macro avg       1.00      1.00      1.00     37817
+weighted avg       1.00      1.00      1.00     37817
+ samples avg       1.00      1.00      1.00     37817
+
+
+SUM SUPPORTS TEST:  9456
+AUC_W TEST:  0.5
+
+SUM SUPPORTS TRAIN:  37817
+AUC_W TRAIN:  1.0
+
+[+] Line added ...
+[+] Line added ...
+---FPR TEST WRITTEN---
+---TPR TEST WRITTEN---
+---FPR TRAIN WRITTEN---
+---TPR TRAIN WRITTEN---
+------------------
+ [+] Time Stamp: --- REP: ---10--- Kfold: ---4--- Model: ---SVC--- FINISHED! [+]
+------------------
+Elapsed time:  1 day, 21:15:22.654502

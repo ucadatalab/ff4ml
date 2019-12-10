@@ -56,7 +56,7 @@ def getArguments():
     parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
     parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-   # parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
+    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
 
     return parser.parse_args()
 
@@ -85,7 +85,7 @@ def main(args):
     instantIni = datetime.now()
 
    # root_path = './data/'
-  #  root_path_output = './results/'
+   # root_path_output = './results/'
     root_path = '../data/' # Ejecución en supercomputador
     root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
     
