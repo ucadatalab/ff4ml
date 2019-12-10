@@ -56,7 +56,7 @@ def getArguments():
     parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
     parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
+   # parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
 
     return parser.parse_args()
 
@@ -80,14 +80,14 @@ def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-    ts=args.exec_ts  # Ejecución en supercomputador
+  #  ts=args.exec_ts  # Ejecución en supercomputador
 
     instantIni = datetime.now()
 
- #   root_path = './data/'
- #   root_path_output = './results/'
-    root_path = '../data/' # Ejecución en supercomputador
-    root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
+    root_path = './data/'
+    root_path_output = './results/'
+  #  root_path = '../data/' # Ejecución en supercomputador
+   # root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
     
     mc_file = 'ugr16_multiclass.csv'
     mcfold_file = 'ugr16_multiclass_folds.csv'
@@ -155,7 +155,8 @@ def main(args):
     print("[+] Calculating hyper-parameters for the classifier: " + title + " ...")
     print("")
     if model == 'rf':
-        parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
+        # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
+        parameters = {'n_estimators': [500], 'max_features': [2,4,8,16]}
         model_grid = RandomForestClassifier(random_state=0, min_samples_split=2, min_samples_leaf=2)
     elif model == 'svc':
         parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
@@ -174,7 +175,7 @@ def main(args):
         # Save selected parameters to .json
 
         path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(
-            kfold) + "_" + "output" + ".json"
+            kfold) + "_" + "output_NE" + ".json"
         with open(path_param_output_json_bp, "w") as fi:
             json.dump(bp, fi)
 
@@ -185,12 +186,13 @@ def main(args):
     print("[+] PARAMETERS SELECTED MODEL " + title + " [+]")
     print("")
     if model == 'rf':
-        md = int(bp.get('max_depth'))
-        print("Max_Depth: ", md)
-        nit = int(bp.get('n_estimators'))
-        print("N_Estimators: ", nit)
-        tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md,
-                                        random_state=0, n_estimators=nit, verbose=verbose)
+        # md = int(bp.get('max_depth'))
+        mf = int(bp.get('max_features'))
+        print("Max_Features: ", mf)
+        # nit = int(bp.get('n_estimators'))
+        # print("N_Estimators: ", nit)
+        # tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
+        tmodel = RandomForestClassifier(max_features=mf, random_state=0, n_estimators=500, verbose=verbose)
     elif model == 'lr':
         print("Solver: lbfgs")
         print("Multi_class: auto")
