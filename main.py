@@ -175,7 +175,7 @@ def main(args):
         # Save selected parameters to .json
 
         path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(
-            kfold) + "_" + "output_NE" + ".json"
+            kfold) + "_" + "output" + ".json"
         with open(path_param_output_json_bp, "w") as fi:
             json.dump(bp, fi)
 
@@ -188,7 +188,7 @@ def main(args):
     if model == 'rf':
         # md = int(bp.get('max_depth'))
         mf = int(bp.get('max_features'))
-	ne = int(bp.get('n_estimators'))	
+        ne = int(bp.get('n_estimators'))	
         print("Max_Features: ", mf)
 	print("n_estimators: ", ne)		
         # nit = int(bp.get('n_estimators'))
