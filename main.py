@@ -24,6 +24,7 @@ from sklearn.metrics import classification_report
 from datetime import datetime
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import label_binarize
+import time
 import json
 
 # Models verbose
@@ -82,10 +83,12 @@ def main(args):
     kfold=args.kfold
     ts=args.exec_ts  # Ejecución en supercomputador
 
-    instantIni = datetime.now()
+    instantIni = time.time()
 
-   # root_path = './data/'
-   # root_path_output = './results/'
+    print("[+] Starting task at {0} ({1},{2})".format(datetime.now(),rep,kfold))
+
+    # root_path = './data/'
+    # root_path_output = './results/'
     root_path = '../data/' # Ejecución en supercomputador
     root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
     
@@ -277,8 +280,9 @@ def main(args):
 
     # Send data to .csv
 
-    instantFinal = datetime.now()
-    time = instantFinal - instantIni
+    instantFinal = time.time()
+    # elapsed time in seconds
+    elapsedtime = instantFinal - instantIni
     path_param_output_test = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output_test" + ".csv"
     path_param_output_train = root_path_output + model + "_" + str(rep) + "_" + str(
         kfold) + "_" + "output_train" + ".csv"
@@ -381,7 +385,7 @@ def main(args):
                 ',' + str(clasif_test['weighted avg']['f1-score']) + \
                 ',' + str(clasif_test['weighted avg']['support']) + \
                 ',' + str(auc_w_test) + \
-                ',' + str(time)
+                ',' + str(elapsedtime)
 
     line_train = str(rep) + \
                  ',' + str(kfold) + \
@@ -426,7 +430,7 @@ def main(args):
                  ',' + str(clasif_train['weighted avg']['f1-score']) + \
                  ',' + str(clasif_train['weighted avg']['support']) + \
                  ',' + str(auc_w_train) + \
-                 ',' + str(time)
+                 ',' + str(elapsedtime)
 
     write_param(path_param_output_test, line_test, header)
     write_param(path_param_output_train, line_train, header)
@@ -470,7 +474,9 @@ def main(args):
           "--- Model: ---" + title +
           "---" + " FINISHED! [+]")
     print("------------------")
-    print("Elapsed time: ", time)
+    print("Elapsed time (s): ", elapsedtime)
+
+    print("[+] Finishing task at {0} ({1},{2})".format(datetime.now(),rep,kfold))
 
 
 if __name__ == "__main__":
