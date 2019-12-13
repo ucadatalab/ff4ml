@@ -159,11 +159,10 @@ def main(args):
     print("")
     if model == 'rf':
         # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
-        parameters = {'n_estimators': [100,200,300,400,500], 'max_features': [2,4,8,16]}
-        model_grid = RandomForestClassifier(random_state=0, min_samples_split=2, min_samples_leaf=2)
+        parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
+        model_grid = RandomForestClassifier(random_state=0)
     elif model == 'svc':
         parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
-
         model_grid = SVC(random_state=0, kernel='rbf')
 
     if model != 'lr':
@@ -191,13 +190,13 @@ def main(args):
     if model == 'rf':
         # md = int(bp.get('max_depth'))
         mf = int(bp.get('max_features'))
-        ne = int(bp.get('n_estimators'))	
+        # ne = int(bp.get('n_estimators'))
         print("Max_Features: ", mf)
-        print("n_estimators: ", ne)
+        # print("n_estimators: ", ne)
         # nit = int(bp.get('n_estimators'))
         # print("N_Estimators: ", nit)
         # tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
-        tmodel = RandomForestClassifier(max_features=mf, random_state=0, n_estimators=ne, verbose=verbose)
+        tmodel = RandomForestClassifier(max_features=mf, random_state=0, verbose=verbose)
     elif model == 'lr':
         print("Solver: lbfgs")
         print("Multi_class: auto")
