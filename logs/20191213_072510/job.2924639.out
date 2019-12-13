@@ -1,0 +1,7 @@
+[+] Starting task at 2019-12-13 07:25:20.461082 (1,4)
+[+] Reading datasets ...
+[-]ugr16_multiclass.csv OK
+[-]ugr16_multiclass_folds.csv OK
+[-]ugr16_multiclass_folds_selecvars.csv OK
+[+] Calculating hyper-parameters for the classifier: RANDOM FOREST ...
+
