@@ -190,13 +190,13 @@ def main(args):
     if model == 'rf':
         # md = int(bp.get('max_depth'))
         mf = int(bp.get('max_features'))
-        # ne = int(bp.get('n_estimators'))
+        ne = int(bp.get('n_estimators'))
         print("Max_Features: ", mf)
-        # print("n_estimators: ", ne)
+        print("n_estimators: ", ne)
         # nit = int(bp.get('n_estimators'))
         # print("N_Estimators: ", nit)
         # tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
-        tmodel = RandomForestClassifier(max_features=mf, random_state=0, verbose=verbose)
+        tmodel = RandomForestClassifier(max_features=mf, n_estimators=ne, random_state=0, verbose=verbose)
     elif model == 'lr':
         print("Solver: lbfgs")
         print("Multi_class: auto")
