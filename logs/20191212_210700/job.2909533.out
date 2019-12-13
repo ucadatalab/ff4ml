@@ -1,0 +1,73 @@
+[+] Starting task at 2019-12-12 21:12:23.883361 (11,1)
+[+] Reading datasets ...
+[-]ugr16_multiclass.csv OK
+[-]ugr16_multiclass_folds.csv OK
+[-]ugr16_multiclass_folds_selecvars.csv OK
+[+] Calculating hyper-parameters for the classifier: LOGISTIC REGRESSION ...
+
+[+] PARAMETERS SELECTED MODEL LOGISTIC REGRESSION [+]
+
+Solver: lbfgs
+Multi_class: auto
+Penalty: none
+[+] TRAINING MODELS [+]
+
+[+] Model Training: LOGISTIC REGRESSION
+
+
+[+] MODEL PREDICTING lr
+
+
+[+] CLASSIFICATION REPORT TEST lr
+
+              precision    recall  f1-score   support
+
+  background       0.82      0.92      0.87      6017
+         dos       0.90      0.98      0.94        84
+ nerisbotnet       0.95      0.88      0.92       119
+        scan       0.78      0.89      0.83        36
+     sshscan       0.00      0.00      0.00         6
+     udpscan       0.00      0.00      0.00         2
+        spam       0.81      0.62      0.70      3191
+
+   micro avg       0.81      0.82      0.82      9455
+   macro avg       0.61      0.61      0.61      9455
+weighted avg       0.81      0.82      0.81      9455
+ samples avg       0.81      0.82      0.81      9455
+
+
+[+] CLASSIFICATION REPORT TRAIN lr
+
+              precision    recall  f1-score   support
+
+  background       0.81      0.92      0.86     24072
+         dos       1.00      0.94      0.97       333
+ nerisbotnet       0.98      0.89      0.93       475
+        scan       1.00      0.99      1.00       140
+     sshscan       0.00      0.00      0.00        21
+     udpscan       1.00      1.00      1.00         7
+        spam       0.81      0.60      0.69     12768
+
+   micro avg       0.82      0.81      0.81     37816
+   macro avg       0.80      0.76      0.78     37816
+weighted avg       0.82      0.81      0.81     37816
+ samples avg       0.80      0.81      0.81     37816
+
+
+SUM SUPPORTS TEST:  9455
+AUC_W TEST:  0.779966762813756
+
+SUM SUPPORTS TRAIN:  37816
+AUC_W TRAIN:  0.7757647951558697
+
+[+] Line added ...
+[+] Line added ...
+---FPR TEST WRITTEN---
+---TPR TEST WRITTEN---
+---FPR TRAIN WRITTEN---
+---TPR TRAIN WRITTEN---
+------------------
+ [+] Time Stamp: --- REP: ---11--- Kfold: ---1--- Model: ---LOGISTIC REGRESSION--- FINISHED! [+]
+------------------
+Elapsed time (s):  29.518648386001587
+[+] Finishing task at 2019-12-12 21:12:53.431913 (11,1)
