@@ -27,6 +27,9 @@ from sklearn.preprocessing import label_binarize
 import time
 import json
 
+from skopt import BayesSearchCV
+from skopt.space import Real, Categorical, Integer
+
 # Models verbose
 verbose = False
 
@@ -155,18 +158,28 @@ def main(args):
     elif model == 'svc':
         title = 'SVC'
 
-    print("[+] Calculating hyper-parameters for the classifier: " + title + " ...")
+    print("[+] Computing hyper-parameters for the classifier: " + title + " ...")
     print("")
     if model == 'rf':
         # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
-        parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
-        model_grid = RandomForestClassifier(random_state=0)
+        #parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
+        parameters = {'n_estimators': Integer(500,600), 'max_features': Integer(2,16), }
+        model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
+
     elif model == 'svc':
-        parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
+        #parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
+        parameters = {
+            'C': Real(0.1, 100, prior='log-uniform'),
+            'gamma': Real(2e-3, 2, prior='log-uniform')
+        }
+
         model_grid = SVC(random_state=0, kernel='rbf')
 
     if model != 'lr':
-        clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
+
+        clf = BayesSearchCV( model_grid, parameters,
+                             n_iter=30, n_jobs=3, cv=5, n_points=8)
+        #clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
         clf.fit(X_train_scaled, y_train)
         print("")
         print("[+] The best parameters for " + "Rep.: " + str(rep) + " and Kfold: " + str(kfold) + " are:  [+]")
@@ -196,7 +209,7 @@ def main(args):
         # nit = int(bp.get('n_estimators'))
         # print("N_Estimators: ", nit)
         # tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
-        tmodel = RandomForestClassifier(max_features=mf, n_estimators=ne, random_state=0, verbose=verbose)
+        tmodel = clf
     elif model == 'lr':
         print("Solver: lbfgs")
         print("Multi_class: auto")
@@ -208,8 +221,7 @@ def main(args):
         print("cs: ", cs)
         ga = float(bp.get('gamma'))
         print("ga: ", ga)
-        tmodel = SVC(random_state=0, kernel='rbf', gamma=ga, C=cs, verbose=verbose)
-
+        tmodel = clf
     # Training models
     print("[+] TRAINING MODELS " + "[+]")
     print("")
