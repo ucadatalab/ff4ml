@@ -1,0 +1,77 @@
+[+] Starting task at 2019-12-17 18:12:40.383143 (10,1)
+[+] Reading datasets ...
+[-]ugr16_multiclass.csv OK
+[-]ugr16_multiclass_folds.csv OK
+[-]ugr16_multiclass_folds_selecvars.csv OK
+[+] Computing hyper-parameters for the classifier: RANDOM FOREST ...
+
+
+[+] The best parameters for Rep.: 10 and Kfold: 1 are:  [+]
+{'max_features': 7, 'n_estimators': 551}
+
+---BEST PARAMETERS WRITED---
+[+] PARAMETERS SELECTED MODEL RANDOM FOREST [+]
+
+Max_Features:  7
+n_estimators:  551
+[+] TRAINING MODELS [+]
+
+[+] Model Training: RANDOM FOREST
+
+
+[+] MODEL PREDICTING rf
+
+
+[+] CLASSIFICATION REPORT TEST rf
+
+              precision    recall  f1-score   support
+
+  background       0.88      0.97      0.92      6017
+         dos       0.96      0.78      0.86        83
+ nerisbotnet       0.98      0.95      0.97       118
+        scan       0.94      0.97      0.96        35
+     sshscan       0.00      0.00      0.00         5
+     udpscan       1.00      0.50      0.67         2
+        spam       0.92      0.76      0.83      3192
+
+   micro avg       0.90      0.89      0.89      9452
+   macro avg       0.81      0.70      0.74      9452
+weighted avg       0.90      0.89      0.89      9452
+ samples avg       0.89      0.89      0.89      9452
+
+
+[+] CLASSIFICATION REPORT TRAIN rf
+
+              precision    recall  f1-score   support
+
+  background       1.00      1.00      1.00     24073
+         dos       1.00      1.00      1.00       334
+ nerisbotnet       1.00      1.00      1.00       476
+        scan       1.00      1.00      1.00       141
+     sshscan       1.00      1.00      1.00        22
+     udpscan       1.00      1.00      1.00         7
+        spam       1.00      1.00      1.00     12768
+
+   micro avg       1.00      1.00      1.00     37821
+   macro avg       1.00      1.00      1.00     37821
+weighted avg       1.00      1.00      1.00     37821
+ samples avg       1.00      1.00      1.00     37821
+
+
+SUM SUPPORTS TEST:  9452
+AUC_W TEST:  0.869386170105535
+
+SUM SUPPORTS TRAIN:  37821
+AUC_W TRAIN:  1.0
+
+[+] Line added ...
+[+] Line added ...
+---FPR TEST WRITTEN---
+---TPR TEST WRITTEN---
+---FPR TRAIN WRITTEN---
+---TPR TRAIN WRITTEN---
+------------------
+ [+] Time Stamp: --- REP: ---10--- Kfold: ---1--- Model: ---RANDOM FOREST--- FINISHED! [+]
+------------------
+Elapsed time (s):  23854.609869480133
+[+] Finishing task at 2019-12-18 00:50:15.017090 (10,1)
