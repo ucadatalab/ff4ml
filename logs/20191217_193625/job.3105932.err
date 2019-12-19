@@ -1,0 +1,10 @@
+/home/inginf/u05679288/miniconda3/envs/attackclass/lib/python3.6/site-packages/sklearn/preprocessing/data.py:625: DataConversionWarning: Data with input dtype int64 were all converted to float64 by StandardScaler.
+  return self.partial_fit(X, y)
+/home/inginf/u05679288/miniconda3/envs/attackclass/lib/python3.6/site-packages/sklearn/base.py:462: DataConversionWarning: Data with input dtype int64 were all converted to float64 by StandardScaler.
+  return self.fit(X, **fit_params).transform(X)
+/home/inginf/u05679288/miniconda3/envs/attackclass/lib/python3.6/site-packages/sklearn/preprocessing/data.py:625: DataConversionWarning: Data with input dtype int64 were all converted to float64 by StandardScaler.
+  return self.partial_fit(X, y)
+/home/inginf/u05679288/miniconda3/envs/attackclass/lib/python3.6/site-packages/sklearn/base.py:462: DataConversionWarning: Data with input dtype int64 were all converted to float64 by StandardScaler.
+  return self.fit(X, **fit_params).transform(X)
+/home/inginf/u05679288/miniconda3/envs/attackclass/lib/python3.6/site-packages/sklearn/metrics/classification.py:1143: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in samples with no predicted labels.
+  'precision', 'predicted', average, warn_for)
