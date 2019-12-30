@@ -1,5 +1,8 @@
 Description
 ------------
+ff4ml shows a framework that implements the proposed methodology validating its suitability, to evaluate and compare NIDS approaches ML-based.
+
+<img src="metodology.png" alt="FF4ML metodology " width="100%">
 
 
 ## Installation
