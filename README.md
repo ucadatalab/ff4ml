@@ -35,7 +35,8 @@ Once you have configured the programming environment (Pycharm as a suggestion), 
 
 A possible example of execution would be like this:
 
-python main.py lr 2 3
+    $ python main.py lr 2 3
+
 
 What would it mean for repetition 2 of kfold 3 to be executed for the Logistic Regression model
 
