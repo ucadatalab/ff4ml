@@ -1,0 +1,76 @@
+[+] Starting task at 2019-12-29 08:59:50.586161 (16,2)
+[+] Reading datasets ...
+[-]ugr16_multiclass.csv OK
+[-]ugr16_multiclass_folds.csv OK
+[-]ugr16_multiclass_folds_selecvars.csv OK
+[+] Computing hyper-parameters for the classifier: SVC ...
+
+
+[+] The best parameters for Rep.: 16 and Kfold: 2 are:  [+]
+{'C': 0.2773993088574056}
+
+---BEST PARAMETERS WRITED---
+[+] PARAMETERS SELECTED MODEL SVC [+]
+
+cs:  0.2773993088574056
+[+] TRAINING MODELS [+]
+
+[+] Model Training: SVC
+
+
+[+] MODEL PREDICTING svc
+
+
+[+] CLASSIFICATION REPORT TEST svc
+
+              precision    recall  f1-score   support
+
+  background       0.82      0.93      0.87      6017
+         dos       0.95      0.86      0.90        84
+ nerisbotnet       0.97      0.92      0.94       119
+        scan       0.84      0.91      0.88        35
+     sshscan       0.00      0.00      0.00         5
+     udpscan       0.00      0.00      0.00         2
+        spam       0.82      0.62      0.71      3193
+
+   micro avg       0.82      0.82      0.82      9455
+   macro avg       0.63      0.61      0.61      9455
+weighted avg       0.82      0.82      0.82      9455
+ samples avg       0.81      0.82      0.82      9455
+
+
+[+] CLASSIFICATION REPORT TRAIN svc
+
+              precision    recall  f1-score   support
+
+  background       0.82      0.93      0.87     24072
+         dos       0.99      0.91      0.95       333
+ nerisbotnet       0.97      0.89      0.93       475
+        scan       0.99      0.96      0.97       141
+     sshscan       0.00      0.00      0.00        22
+     udpscan       1.00      0.71      0.83         7
+        spam       0.84      0.60      0.70     12768
+
+   micro avg       0.83      0.82      0.82     37818
+   macro avg       0.80      0.72      0.75     37818
+weighted avg       0.83      0.82      0.82     37818
+ samples avg       0.81      0.82      0.82     37818
+
+
+SUM SUPPORTS TEST:  9455
+AUC_W TEST:  0.7846485949477354
+
+SUM SUPPORTS TRAIN:  37818
+AUC_W TRAIN:  0.7856189905080807
+
+[+] Line added ...
+[+] Line added ...
+---FPR TEST WRITTEN---
+---TPR TEST WRITTEN---
+---FPR TRAIN WRITTEN---
+---TPR TRAIN WRITTEN---
+------------------
+ [+] Time Stamp: --- REP: ---16--- Kfold: ---2--- Model: ---SVC--- FINISHED! [+]
+------------------
+Elapsed time (s):  129500.75004076958
+[+] Finishing task at 2019-12-30 20:58:11.378224 (16,2)
