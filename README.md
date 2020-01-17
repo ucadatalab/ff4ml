@@ -5,6 +5,8 @@ ff4ml shows a framework that implements the proposed methodology validating its 
 <img src="metodology.png" alt="FF4ML metodology " width="100%">
 
 All experimentation has been carried out on a suitable dataset, UGR'16. The comparisons are made with studies by other authors in [MSNM](https://ieeexplore.ieee.org/document/8628992). 
+sn
+The results of the experiment are saved in the './results' folder. On the other hand the derived datasets, with which this framework starts, are located in the '~/ffml4/data' folder
 
 
 ## Installation
@@ -33,7 +35,7 @@ Once the Anaconda environment has been created, and having been logged in, to in
 
 #### How to run an example
 
-To run an example, once the runtime environment is configured, the first thing to do is make sure that the source data sets are in the corresponding folder. To do this you must download the 'data' folder, from this repository to the '/ home' where it will run. Subsequently, the file 'main.py' must be executed, to which three arguments must be offered: model, repetition number and kfold number.
+To run an example, once the runtime environment is configured, the first thing to do is make sure that the source data sets are in the corresponding folder. We have to make sure that the 'data' folder is downloaded at '/ home'. Subsequently, the file 'main.py' must be executed, to which three arguments must be offered: model, repetition number and kfold number.
 
 * Model: lr, rf, svc. These correspond, respectively, to Logistic Regression, Random Forest and Support Vector Machine. (See paper to learn how the parameters have been chosen).
 
@@ -43,9 +45,12 @@ To run an example, once the runtime environment is configured, the first thing t
 
 A possible example of execution would be like this:
 
+    $ $ cd ~/ff4ml
+    $ conda activate ff4ml
     $ python main.py lr 2 3
 
 
 What would it mean for repetition 2 of kfold 3 to be executed for the Logistic Regression model. 
-The results of the experiment are saved in the './results' folder.
+
+
 
