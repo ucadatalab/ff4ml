@@ -23,7 +23,7 @@ Without a doubt, the best way to execute this development is through a Python ex
 
 The steps to follow if you want to use this environment are the following:
 
-$ conda create -n ff4ml python=3.6
+$ conda create -n ff4ml python=3.6 
 $ conda activate ff4ml
 
 Once the Anaconda environment has been created, and having been logged in, to install all the necessary requirements for the execution of our projects, it will be enough to execute the following instruction:
