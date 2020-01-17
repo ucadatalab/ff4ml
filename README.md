@@ -19,13 +19,21 @@ FF4ml runs with python 3.6 and has been successfully tested on Ubuntu from 18.04
 * scikit-optimize>=0.5.2
 
 #### How to install
-For both users of Windows, Linux or Mac environments, we recommend the installation of the Community version of the Pycharm IDE. To obtain the application, we go to the PyCharm homepage or directly to the [download area](https://www.jetbrains.com/pycharm/download/). There you can choose the environment where the execution is going to take place (Linux, Windows, Mac).
+Without a doubt, the best way to execute this development is through a Python execution environment. That is why it is recommended to create one before beginning the installation of the requirements. Thus, we recommend using Anaconda as an aid in this process. 
 
-Once the installation file has been downloaded, it will be up to the user to execute it and follow the rules established by the interface. Note that this IDE presents the possibility of downloading plugin for Anaconda.
+The steps to follow if you want to use this environment are the following:
+
+$ conda create -n ff4ml python=3.6
+$ conda activate ff4ml
+
+Once the Anaconda environment has been created, and having been logged in, to install all the necessary requirements for the execution of our projects, it will be enough to execute the following instruction:
+
+(ff4ml) $ pip install -r requirements.txt
+
 
 #### How to run an example
 
-Once you have configured the programming environment (Pycharm as a suggestion), you must download the 'data' folder, from this repository to the '/ home' where it will be executed. Subsequently, the file 'main.py' must be executed, to which three arguments must be offered: model, repetition number and kfold number.
+To run an example, once the runtime environment is configured, the first thing to do is make sure that the source data sets are in the corresponding folder. To do this you must download the 'data' folder, from this repository to the '/ home' where it will run. Subsequently, the file 'main.py' must be executed, to which three arguments must be offered: model, repetition number and kfold number.
 
 * Model: lr, rf, svc. These correspond, respectively, to Logistic Regression, Random Forest and Support Vector Machine. (See paper to learn how the parameters have been chosen).
 
