@@ -6,7 +6,7 @@ ff4ml shows a framework that implements the proposed methodology validating its 
 
 All experimentation has been carried out on a suitable dataset, UGR'16. The comparisons are made with studies by other authors in [MSNM](https://ieeexplore.ieee.org/document/8628992). 
 
-The results of the experiment are saved in the './results' folder. On the other hand the derived datasets, with which this framework starts, are located in the '~/ffml4/data' folder
+The results of the experiment are saved in the '~/ffml4/results' folder. On the other hand the derived datasets, with which this framework starts, are located in the '~/ffml4/data' folder
 
 
 ## Installation
