@@ -1,0 +1,72 @@
+#
+# FF4ML configuration file
+#
+
+# Raw data in CSV format
+rawdata:
+  path: "<path_to_raw_data>"
+# Feature Engineering process
+fe:
+  # Raw data input
+  input: "<path_to_raw_data>"
+  types:
+    FaaC:
+      # File where the method search for its necessary working parameters
+      config: "./fe/fcparser_configuration.yaml"
+  # The selected FE method is more than one is available
+  selected:
+  - FaaC
+  # The derived dataset
+  output: "<output_fe_data>"
+
+# K-fold crossvalidation configuration - Generation of *_folds.csv file.
+cv:
+  input: "<output_fe_data>"
+  params:
+    k: 5 # folds
+    r: 20 # repetitions
+  output: "<output_cv_folds>"
+# Feature Selection
+fs:
+  input: "<output_cv_folds>"
+  types:
+    Lasso:
+      config: "./fs/lasso.yaml"
+  selected:
+  - Lasso
+  output: "<output_fs_selecvars_folds>"
+# Data Pre-processing
+dp:
+  types:
+    StandardScaler:
+      config: "./dp/ss.yaml"
+  selected:
+  - StandardScaler
+# Hyper parameter Selection methods
+hs:
+  types:
+    BayesSearchCV:
+      config: "./hs/bs.yaml"
+    GridSearchCV:
+      config: "./hs/gs.yaml"
+  selected:
+  - BayesSearchCV
+# Available ML or DL models and configuration
+ml:
+  types:
+    LogisticRegression:
+      config: "./ml/lr.yaml"
+  selected:
+  - LogisticRegression
+# Performance evaluation Metrics
+pm:
+  types:
+  - AUC
+  - ROC
+  - TPR
+  - FPR
+  selected:
+  - AUC
+  - ROC
+  - TPR
+  - FPR
