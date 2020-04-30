@@ -24,11 +24,11 @@ model=$1
 
 # repetitions
 REP_START=1
-REP_END=20
+REP_END=1
 
 # K-folds
 OUTFOLD_START=1
-OUTFOLD_END=5
+OUTFOLD_END=1
 
 # execution timestamp
 exec_ts=`date +"%Y%m%d_%H%M%S"`
@@ -54,8 +54,8 @@ do
     for ((k=$OUTFOLD_START; k<=$OUTFOLD_END; k++))
     do
 	echo "[-] Running task for model: $model, rep: $r, k-fold: $k"
-        sbatch $FLAGS --wrap="python ../main.py $model $r $k $exec_ts"
-        # python ../main.py $model $r $k $exec_ts
+        #sbatch $FLAGS --wrap="python ../main.py $model $r $k $exec_ts"
+        python ../main.py $model $r $k $exec_ts
         TOTAL=`expr $TOTAL + 1`
         sleep 2s
     done
