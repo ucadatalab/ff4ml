@@ -194,7 +194,7 @@ def main(args):
         with open(path_param_output_json_bp, "w") as fi:
             json.dump(bp, fi)
 
-        print("---BEST PARAMETERS WRITED---")
+        print("---BEST PARAMETERS SAVED ---")
 
     # PARAMETERS SELECTED
 

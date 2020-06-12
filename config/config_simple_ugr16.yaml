@@ -1,0 +1,25 @@
+#
+# FF4ML simple configuration file
+#
+
+# UGR16
+
+# Dataset labels and ids
+classes:
+  background: 0
+  dos: 1
+  nerisbotnet: 2
+  scan: 3
+  sshscan: 4
+  udpscan: 5
+  spam: 6
+
+folder_paths:
+  root_path: './data/'
+  root_path_output: './results/'
+
+file_names:
+  mc_file: 'ugr16_multiclass.csv'
+  mcfold_file: 'ugr16_multiclass_folds.csv'
+  mcvars_file: 'ugr16_multiclass_folds_selecvars.csv'
+
