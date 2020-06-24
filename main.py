@@ -45,9 +45,6 @@ classes_map = {'background': 0,
 # Labels
 labels = list(classes_map.keys())
 
-# Labels' IDs
-ids = list(classes_map.values())
-
 
 def getArguments():
     """
@@ -124,7 +121,8 @@ def main(args):
 
     # Data separation and label
     X = df[f]
-    y = df['outcome.multiclass'].map(classes_map)
+    #y = df['outcome.multiclass'].map(classes_map)
+    y = df['outcome.multiclass']
 
     # Creation of TRAINING and TEST datasets according to the number of fold.
     group = 'REP.' + str(rep)
@@ -135,12 +133,12 @@ def main(args):
     # Data TRAIN and LABEL
     X_train = X.drop(X.index[rows_fold])
     y_train = y.drop(y.index[rows_fold])
-    y_train_bina = label_binarize(y_train, classes=ids)
+    y_train_bina = label_binarize(y_train, classes=labels)
 
     # Data TEST and LABEL
     X_test = X.drop(X.index[No_rows_fold])
     y_test = y.drop(y.index[No_rows_fold])
-    y_test_bina = label_binarize(y_test, classes=ids)
+    y_test_bina = label_binarize(y_test, classes=labels)
 
     n_classes = y_train_bina.shape[1]
 

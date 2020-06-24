@@ -6,13 +6,13 @@
 
 # Dataset labels and ids
 classes:
-  background: 0
-  dos: 1
-  nerisbotnet: 2
-  scan: 3
-  sshscan: 4
-  udpscan: 5
-  spam: 6
+  - background
+  - dos
+  - nerisbotnet
+  - scan
+  - sshscan
+  - udpscan
+  - spam
 
 folder_paths:
   root_path: './data/'
