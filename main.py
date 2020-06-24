@@ -27,23 +27,12 @@ from sklearn.preprocessing import label_binarize
 import time
 import json
 
+from utils import fileutils
 from skopt import BayesSearchCV
 from skopt.space import Real, Categorical, Integer
 
 # Models verbose
 verbose = False
-
-# Labels mapping
-classes_map = {'background': 0,
-               'dos': 1,
-               'nerisbotnet': 2,
-               'scan': 3,
-               'sshscan': 4,
-               'udpscan': 5,
-               'spam': 6}
-
-# Labels
-labels = list(classes_map.keys())
 
 
 def getArguments():
@@ -54,10 +43,11 @@ def getArguments():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description='''ff4ml (Free Framework for Machine Learning)''')
-    parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
+    parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc', 'rf', 'lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
-    parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
+    parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).', type=int)
+    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.')  # Ejecución en supercomputador
+    parser.add_argument('config_file', metavar='Configuration File', help='Yaml based format configuration file path.')
 
     return parser.parse_args()
 
@@ -78,23 +68,24 @@ def write_param(path_param, line, header):
 
 
 def main(args):
-    model=args.model
-    rep=args.rep
-    kfold=args.kfold
-   # ts=args.exec_ts  # Ejecución en supercomputador
+    model = args.model
+    rep = args.rep
+    kfold = args.kfold
+    # ts=args.exec_ts  # Ejecución en supercomputador
+    config = fileutils.load_config(args.config_file)
 
     instantIni = time.time()
 
-    print("[+] Starting task at {0} ({1},{2})".format(datetime.now(),rep,kfold))
+    print("[+] Starting task at {0} ({1},{2})".format(datetime.now(), rep, kfold))
+    print(config)
+    root_path = config['folder_paths']['root_path']
+    root_path_output = config['folder_paths']['root_path_output']
+    #  root_path = '../data/' # Ejecución en supercomputador
+    # root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
 
-    root_path = './data/'
-    root_path_output = './results/'
-  #  root_path = '../data/' # Ejecución en supercomputador
-   # root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
-    
-    mc_file = 'ugr16_multiclass.csv'
-    mcfold_file = 'ugr16_multiclass_folds.csv'
-    mcvars_file = 'ugr16_multiclass_folds_selecvars.csv'
+    mc_file = config['file_paths']['mc_file']
+    mcfold_file = config['file_paths']['mcfold_file']
+    mcvars_file = config['file_paths']['mcvars_file']
 
     df = pd.read_csv(root_path + mc_file, index_col=0)
     df_folds = pd.read_csv(root_path + mcfold_file)
@@ -121,7 +112,6 @@ def main(args):
 
     # Data separation and label
     X = df[f]
-    #y = df['outcome.multiclass'].map(classes_map)
     y = df['outcome.multiclass']
 
     # Creation of TRAINING and TEST datasets according to the number of fold.
@@ -129,6 +119,9 @@ def main(args):
 
     rows_fold = df_folds.iloc[df_folds.groupby(group).groups[kfold]].index
     No_rows_fold = df_folds[df_folds[group] != kfold][group].index
+
+    # Getting labels from config file
+    labels = config['labels']
 
     # Data TRAIN and LABEL
     X_train = X.drop(X.index[rows_fold])
@@ -140,7 +133,7 @@ def main(args):
     y_test = y.drop(y.index[No_rows_fold])
     y_test_bina = label_binarize(y_test, classes=labels)
 
-    n_classes = y_train_bina.shape[1]
+    n_classes = len(labels)
 
     # Data normalization
 
@@ -160,12 +153,12 @@ def main(args):
     print("")
     if model == 'rf':
         # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
-        #parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
-        parameters = {'n_estimators': Integer(500,600), 'max_features': Integer(2,16), }
+        # parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
+        parameters = {'n_estimators': Integer(500, 600), 'max_features': Integer(2, 16), }
         model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
 
     elif model == 'svc':
-        #parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
+        # parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
         parameters = {
             'C': Real(0.1, 100, prior='log-uniform'),
             'gamma': Real(2e-3, 2, prior='log-uniform')
@@ -174,10 +167,9 @@ def main(args):
         model_grid = SVC(random_state=0, kernel='rbf')
 
     if model != 'lr':
-
-        clf = BayesSearchCV( model_grid, parameters,
-                             n_iter=30, n_jobs=3, cv=5, n_points=8)
-        #clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
+        clf = BayesSearchCV(model_grid, parameters,
+                            n_iter=30, n_jobs=3, cv=5, n_points=8)
+        # clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
         clf.fit(X_train_scaled, y_train)
         print("")
         print("[+] The best parameters for " + "Rep.: " + str(rep) + " and Kfold: " + str(kfold) + " are:  [+]")
@@ -256,9 +248,9 @@ def main(args):
     supports_sum_test = 0
     auc_partial_test = 0
 
-    for i in range(len(labels)):
-        supports_sum_test = supports_sum_test + (clasif_test[labels[i]]['support'])
-        auc_partial_test = auc_partial_test + ((clasif_test[labels[i]]['support']) * roc_auc_test[i])
+    for label in config['labels']:
+        supports_sum_test = supports_sum_test + (clasif_test[label]['support'])
+        auc_partial_test = auc_partial_test + ((clasif_test[label]['support']) * roc_auc_test[i])
     auc_w_test = auc_partial_test / supports_sum_test
 
     print("SUM SUPPORTS TEST: ", supports_sum_test)
@@ -278,9 +270,9 @@ def main(args):
     supports_sum_train = 0
     auc_partial_train = 0
 
-    for i in range(len(labels)):
-        supports_sum_train = supports_sum_train + (clasif_train[labels[i]]['support'])
-        auc_partial_train = auc_partial_train + ((clasif_train[labels[i]]['support']) * roc_auc_train[i])
+    for label in config['labels']:
+        supports_sum_train = supports_sum_train + (clasif_train[label]['support'])
+        auc_partial_train = auc_partial_train + ((clasif_train[label]['support']) * roc_auc_train[i])
     auc_w_train = auc_partial_train / supports_sum_train
 
     print("SUM SUPPORTS TRAIN: ", supports_sum_train)
@@ -306,44 +298,20 @@ def main(args):
     path_param_output_json_tpr_train = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(
         kfold) + "_" + "output_train" + ".json"
 
+    # Automatically building the header according to the labels.
     header = "Rep." + \
              "," + "Kfold" + \
-             "," + "Num. Vars." + \
-             "," + "Precision-Background" + \
-             "," + "Recall-Background" + \
-             "," + "F1_score_Background" + \
-             "," + "Num. Obs. Background" + \
-             "," + "AUC_Background" + \
-             "," + "Precision-DoS" + \
-             "," + "Recall-DoS" + \
-             "," + "F1_score_DoS" + \
-             "," + "Num. Obs. Dos" + \
-             "," + "AUC_DoS" + \
-             "," + "Precision-Botnet" + \
-             "," + "Recall-Botnet" + \
-             "," + "F1_score_Botnet" + \
-             "," + "Num. Obs. Botnet" + \
-             "," + "AUC_Botnet" + \
-             "," + "Precision-Scan" + \
-             "," + "Recall-Scan" + \
-             "," + "F1_score_Scan" + \
-             "," + "Num. Obs. Scan" + \
-             "," + "AUC_Scan" + \
-             "," + "Precision-SSHscan" + \
-             "," + "Recall-SSHscan" + \
-             "," + "F1_score_SSHscan" + \
-             "," + "Num. Obs. SSHscan" + \
-             "," + "AUC_SSHscan" + \
-             "," + "Precision-UDPscan" + \
-             "," + "Recall-UDPscan" + \
-             "," + "F1_score_UDPscan" + \
-             "," + "Num. Obs. UDPscan" + \
-             "," + "AUC_UDPscan" + \
-             "," + "Precision-Spam" + \
-             "," + "Recall-Spam" + \
-             "," + "F1_score_Spam" + \
-             "," + "Num. Obs. Spam" + \
-             "," + "AUC_Spam" + \
+             "," + "Num. Vars."
+
+    for label in labels:
+        header = header + \
+                 "," + "Precision-" + label + \
+                 "," + "Recall-" + label + \
+                 "," + "F1_score_" + label + \
+                 "," + "Num. Obs. " + label + \
+                 "," + "AUC_" + label
+
+    header = header + \
              "," + "Precision-w" + \
              "," + "Recall-w" + \
              "," + "F1_score_w" + \
@@ -351,44 +319,36 @@ def main(args):
              "," + "AUC_w" + \
              "," + "Time"
 
+
+    line_test = []
+    line_test.append(rep)
+    line_test.append(kfold)
+    line_test.append(len(f)) # Number of selected variables
+
+    for i,label in enumerate(labels):
+    line_test.append(clasif_test[label]['precision'])
+
+    line_test = line_test + \
+                ',' + str(clasif_test[label]['precision']) + \
+                ',' + str(clasif_test[label]['recall']) + \
+                ',' + str(clasif_test[label]['f1-score']) + \
+                ',' + str(clasif_test[label]['support']) + \
+                ',' + str(roc_auc_test[i])
+
+
     line_test = str(rep) + \
                 ',' + str(kfold) + \
-                ',' + str(len(f)) + \
-                ',' + str(clasif_test['background']['precision']) + \
-                ',' + str(clasif_test['background']['recall']) + \
-                ',' + str(clasif_test['background']['f1-score']) + \
-                ',' + str(clasif_test['background']['support']) + \
-                ',' + str(roc_auc_test[0]) + \
-                ',' + str(clasif_test['dos']['precision']) + \
-                ',' + str(clasif_test['dos']['recall']) + \
-                ',' + str(clasif_test['dos']['f1-score']) + \
-                ',' + str(clasif_test['dos']['support']) + \
-                ',' + str(roc_auc_test[1]) + \
-                ',' + str(clasif_test['nerisbotnet']['precision']) + \
-                ',' + str(clasif_test['nerisbotnet']['recall']) + \
-                ',' + str(clasif_test['nerisbotnet']['f1-score']) + \
-                ',' + str(clasif_test['nerisbotnet']['support']) + \
-                ',' + str(roc_auc_test[2]) + \
-                ',' + str(clasif_test['scan']['precision']) + \
-                ',' + str(clasif_test['scan']['recall']) + \
-                ',' + str(clasif_test['scan']['f1-score']) + \
-                ',' + str(clasif_test['scan']['support']) + \
-                ',' + str(roc_auc_test[3]) + \
-                ',' + str(clasif_test['sshscan']['precision']) + \
-                ',' + str(clasif_test['sshscan']['recall']) + \
-                ',' + str(clasif_test['sshscan']['f1-score']) + \
-                ',' + str(clasif_test['sshscan']['support']) + \
-                ',' + str(roc_auc_test[4]) + \
-                ',' + str(clasif_test['udpscan']['precision']) + \
-                ',' + str(clasif_test['udpscan']['recall']) + \
-                ',' + str(clasif_test['udpscan']['f1-score']) + \
-                ',' + str(clasif_test['udpscan']['support']) + \
-                ',' + str(roc_auc_test[5]) + \
-                ',' + str(clasif_test['spam']['precision']) + \
-                ',' + str(clasif_test['spam']['recall']) + \
-                ',' + str(clasif_test['spam']['f1-score']) + \
-                ',' + str(clasif_test['spam']['support']) + \
-                ',' + str(roc_auc_test[6]) + \
+                ',' + str(len(f))
+
+    for i, label in enumerate(labels):
+        line_test = line_test + \
+                    ',' + str(clasif_test[label]['precision']) + \
+                    ',' + str(clasif_test[label]['recall']) + \
+                    ',' + str(clasif_test[label]['f1-score']) + \
+                    ',' + str(clasif_test[label]['support']) + \
+                    ',' + str(roc_auc_test[i])
+
+    line_test = line_test + \
                 ',' + str(clasif_test['weighted avg']['precision']) + \
                 ',' + str(clasif_test['weighted avg']['recall']) + \
                 ',' + str(clasif_test['weighted avg']['f1-score']) + \
@@ -485,7 +445,7 @@ def main(args):
     print("------------------")
     print("Elapsed time (s): ", elapsedtime)
 
-    print("[+] Finishing task at {0} ({1},{2})".format(datetime.now(),rep,kfold))
+    print("[+] Finishing task at {0} ({1},{2})".format(datetime.now(), rep, kfold))
 
 
 if __name__ == "__main__":

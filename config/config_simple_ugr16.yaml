@@ -5,7 +5,7 @@
 # UGR16
 
 # Dataset labels and ids
-classes:
+labels:
   - background
   - dos
   - nerisbotnet
@@ -18,7 +18,7 @@ folder_paths:
   root_path: './data/'
   root_path_output: './results/'
 
-file_names:
+file_paths:
   mc_file: 'ugr16_multiclass.csv'
   mcfold_file: 'ugr16_multiclass_folds.csv'
   mcvars_file: 'ugr16_multiclass_folds_selecvars.csv'
