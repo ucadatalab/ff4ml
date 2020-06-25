@@ -299,10 +299,12 @@ def main(args):
         kfold) + "_" + "output_train" + ".json"
 
     # Automatically building the header according to the labels.
+    # head of header
     header = "Rep." + \
              "," + "Kfold" + \
              "," + "Num. Vars."
 
+    # body of header
     for label in labels:
         header = header + \
                  "," + "Precision-" + label + \
@@ -311,6 +313,7 @@ def main(args):
                  "," + "Num. Obs. " + label + \
                  "," + "AUC_" + label
 
+    # tail of header
     header = header + \
              "," + "Precision-w" + \
              "," + "Recall-w" + \
@@ -319,42 +322,24 @@ def main(args):
              "," + "AUC_w" + \
              "," + "Time"
 
-
+    # TEST RESULTS
     line_test = []
     line_test.append(rep)
     line_test.append(kfold)
     line_test.append(len(f)) # Number of selected variables
 
     for i,label in enumerate(labels):
-    line_test.append(clasif_test[label]['precision'])
+        line_test.append(clasif_test[label]['precision'])
+        line_test.append(clasif_test[label]['recall'])
+        line_test.append(clasif_test[label]['f1-score'])
+        line_test.append(clasif_test[label]['support'])
+        line_test.append(roc_auc_test[i])
 
-    line_test = line_test + \
-                ',' + str(clasif_test[label]['precision']) + \
-                ',' + str(clasif_test[label]['recall']) + \
-                ',' + str(clasif_test[label]['f1-score']) + \
-                ',' + str(clasif_test[label]['support']) + \
-                ',' + str(roc_auc_test[i])
+    line_test.append(auc_w_test)
+    line_test.append(elapsedtime)
 
-
-    line_test = str(rep) + \
-                ',' + str(kfold) + \
-                ',' + str(len(f))
-
-    for i, label in enumerate(labels):
-        line_test = line_test + \
-                    ',' + str(clasif_test[label]['precision']) + \
-                    ',' + str(clasif_test[label]['recall']) + \
-                    ',' + str(clasif_test[label]['f1-score']) + \
-                    ',' + str(clasif_test[label]['support']) + \
-                    ',' + str(roc_auc_test[i])
-
-    line_test = line_test + \
-                ',' + str(clasif_test['weighted avg']['precision']) + \
-                ',' + str(clasif_test['weighted avg']['recall']) + \
-                ',' + str(clasif_test['weighted avg']['f1-score']) + \
-                ',' + str(clasif_test['weighted avg']['support']) + \
-                ',' + str(auc_w_test) + \
-                ',' + str(elapsedtime)
+    test_df = pd.DataFrame([1, 2], names=header)
+    test_df.to_csv('path.csv')
 
     line_train = str(rep) + \
                  ',' + str(kfold) + \
@@ -401,8 +386,8 @@ def main(args):
                  ',' + str(auc_w_train) + \
                  ',' + str(elapsedtime)
 
-    write_param(path_param_output_test, line_test, header)
-    write_param(path_param_output_train, line_train, header)
+    #write_param(path_param_output_test, line_test, header)
+    #write_param(path_param_output_train, line_train, header)
 
     # Send data to .json
 
