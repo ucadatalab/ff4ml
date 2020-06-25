@@ -34,13 +34,13 @@ from skopt.space import Real, Categorical, Integer
 verbose = False
 
 # Labels mapping
-classes_map = {'background': 0,
-               'dos': 1,
-               'nerisbotnet': 2,
-               'scan': 3,
-               'sshscan': 4,
-               'udpscan': 5,
-               'spam': 6}
+classes_map = {'label_background': 0,
+               'label_dos': 1,
+               'label_nerisbotnet': 2,
+               'label_scan': 3,
+               'label_anomaly_sshscan': 4,
+               'label_anomaly_udpscan': 5,
+               'label_anomaly_spam': 6}
 
 # Labels
 labels = list(classes_map.keys())
@@ -57,10 +57,10 @@ def getArguments():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description='''ff4ml (Free Framework for Machine Learning)''')
-    parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc','rf','lr'])
+    parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc', 'rf', 'lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
-    parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).',type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.') # Ejecución en supercomputador
+    parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).', type=int)
+    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.')  # Ejecución en supercomputador
 
     return parser.parse_args()
 
@@ -81,25 +81,25 @@ def write_param(path_param, line, header):
 
 
 def main(args):
-    model=args.model
-    rep=args.rep
-    kfold=args.kfold
-    ts=args.exec_ts  # Ejecución en supercomputador
+    model = args.model
+    rep = args.rep
+    kfold = args.kfold
+    ts = args.exec_ts  # Ejecución en supercomputador
 
     instantIni = time.time()
 
-    print("[+] Starting task at {0} ({1},{2})".format(datetime.now(),rep,kfold))
+    print("[+] Starting task at {0} ({1},{2})".format(datetime.now(), rep, kfold))
 
     #root_path = './data/'
     #root_path_output = './results/'
-    root_path = '../data/ugr16/dat_batches/' # Ejecución en supercomputador
-    root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
-    
+    root_path = '../data/ugr16/dat_batches/'  # Ejecución en supercomputador
+    root_path_output = '../results/' + str(ts) + '/'  # Ejecución en supercomputador
+
     mc_file = 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass.csv'
     mcfold_file = 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass_folds.csv'
     mcvars_file = 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass_folds_selecvars.csv'
 
-    df = pd.read_csv(root_path + mc_file, index_col=0)
+    df = pd.read_csv(root_path + mc_file)
     df_folds = pd.read_csv(root_path + mcfold_file)
     df_vars = pd.read_csv(root_path + mcvars_file)
 
@@ -124,7 +124,7 @@ def main(args):
 
     # Data separation and label
     X = df[f]
-    y = df['outcome.multiclass'].map(classes_map)
+    y = df['outcome'].map(classes_map)
 
     # Creation of TRAINING and TEST datasets according to the number of fold.
     group = 'REP.' + str(rep)
@@ -135,6 +135,7 @@ def main(args):
     # Data TRAIN and LABEL
     X_train = X.drop(X.index[rows_fold])
     y_train = y.drop(y.index[rows_fold])
+
     y_train_bina = label_binarize(y_train, classes=ids)
 
     # Data TEST and LABEL
@@ -162,12 +163,12 @@ def main(args):
     print("")
     if model == 'rf':
         # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
-        #parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
-        parameters = {'n_estimators': Integer(500,600), 'max_features': Integer(2,16), }
+        # parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
+        parameters = {'n_estimators': Integer(500, 600), 'max_features': Integer(2, 16), }
         model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
 
     elif model == 'svc':
-        #parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
+        # parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
         parameters = {
             'C': Real(0.1, 100, prior='log-uniform'),
             'gamma': Real(2e-3, 2, prior='log-uniform')
@@ -176,10 +177,9 @@ def main(args):
         model_grid = SVC(random_state=0, kernel='rbf')
 
     if model != 'lr':
-
-        clf = BayesSearchCV( model_grid, parameters,
-                             n_iter=30, n_jobs=3, cv=5, n_points=8)
-        #clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
+        clf = BayesSearchCV(model_grid, parameters,
+                            n_iter=30, n_jobs=3, cv=5, n_points=8)
+        # clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
         clf.fit(X_train_scaled, y_train)
         print("")
         print("[+] The best parameters for " + "Rep.: " + str(rep) + " and Kfold: " + str(kfold) + " are:  [+]")
@@ -194,7 +194,7 @@ def main(args):
         with open(path_param_output_json_bp, "w") as fi:
             json.dump(bp, fi)
 
-        print("---BEST PARAMETERS WRITED---")
+        print("---BEST PARAMETERS SAVED ---")
 
     # PARAMETERS SELECTED
 
@@ -356,40 +356,40 @@ def main(args):
     line_test = str(rep) + \
                 ',' + str(kfold) + \
                 ',' + str(len(f)) + \
-                ',' + str(clasif_test['background']['precision']) + \
-                ',' + str(clasif_test['background']['recall']) + \
-                ',' + str(clasif_test['background']['f1-score']) + \
-                ',' + str(clasif_test['background']['support']) + \
+                ',' + str(clasif_test['label_background']['precision']) + \
+                ',' + str(clasif_test['label_background']['recall']) + \
+                ',' + str(clasif_test['label_background']['f1-score']) + \
+                ',' + str(clasif_test['label_background']['support']) + \
                 ',' + str(roc_auc_test[0]) + \
-                ',' + str(clasif_test['dos']['precision']) + \
-                ',' + str(clasif_test['dos']['recall']) + \
-                ',' + str(clasif_test['dos']['f1-score']) + \
-                ',' + str(clasif_test['dos']['support']) + \
+                ',' + str(clasif_test['label_dos']['precision']) + \
+                ',' + str(clasif_test['label_dos']['recall']) + \
+                ',' + str(clasif_test['label_dos']['f1-score']) + \
+                ',' + str(clasif_test['label_dos']['support']) + \
                 ',' + str(roc_auc_test[1]) + \
-                ',' + str(clasif_test['nerisbotnet']['precision']) + \
-                ',' + str(clasif_test['nerisbotnet']['recall']) + \
-                ',' + str(clasif_test['nerisbotnet']['f1-score']) + \
-                ',' + str(clasif_test['nerisbotnet']['support']) + \
+                ',' + str(clasif_test['label_nerisbotnet']['precision']) + \
+                ',' + str(clasif_test['label_nerisbotnet']['recall']) + \
+                ',' + str(clasif_test['label_nerisbotnet']['f1-score']) + \
+                ',' + str(clasif_test['label_nerisbotnet']['support']) + \
                 ',' + str(roc_auc_test[2]) + \
-                ',' + str(clasif_test['scan']['precision']) + \
-                ',' + str(clasif_test['scan']['recall']) + \
-                ',' + str(clasif_test['scan']['f1-score']) + \
-                ',' + str(clasif_test['scan']['support']) + \
+                ',' + str(clasif_test['label_scan']['precision']) + \
+                ',' + str(clasif_test['label_scan']['recall']) + \
+                ',' + str(clasif_test['label_scan']['f1-score']) + \
+                ',' + str(clasif_test['label_scan']['support']) + \
                 ',' + str(roc_auc_test[3]) + \
-                ',' + str(clasif_test['sshscan']['precision']) + \
-                ',' + str(clasif_test['sshscan']['recall']) + \
-                ',' + str(clasif_test['sshscan']['f1-score']) + \
-                ',' + str(clasif_test['sshscan']['support']) + \
+                ',' + str(clasif_test['label_anomaly_sshscan']['precision']) + \
+                ',' + str(clasif_test['label_anomaly_sshscan']['recall']) + \
+                ',' + str(clasif_test['label_anomaly_sshscan']['f1-score']) + \
+                ',' + str(clasif_test['label_anomaly_sshscan']['support']) + \
                 ',' + str(roc_auc_test[4]) + \
-                ',' + str(clasif_test['udpscan']['precision']) + \
-                ',' + str(clasif_test['udpscan']['recall']) + \
-                ',' + str(clasif_test['udpscan']['f1-score']) + \
-                ',' + str(clasif_test['udpscan']['support']) + \
+                ',' + str(clasif_test['label_anomaly_udpscan']['precision']) + \
+                ',' + str(clasif_test['label_anomaly_udpscan']['recall']) + \
+                ',' + str(clasif_test['label_anomaly_udpscan']['f1-score']) + \
+                ',' + str(clasif_test['label_anomaly_udpscan']['support']) + \
                 ',' + str(roc_auc_test[5]) + \
-                ',' + str(clasif_test['spam']['precision']) + \
-                ',' + str(clasif_test['spam']['recall']) + \
-                ',' + str(clasif_test['spam']['f1-score']) + \
-                ',' + str(clasif_test['spam']['support']) + \
+                ',' + str(clasif_test['label_anomaly_spam']['precision']) + \
+                ',' + str(clasif_test['label_anomaly_spam']['recall']) + \
+                ',' + str(clasif_test['label_anomaly_spam']['f1-score']) + \
+                ',' + str(clasif_test['label_anomaly_spam']['support']) + \
                 ',' + str(roc_auc_test[6]) + \
                 ',' + str(clasif_test['weighted avg']['precision']) + \
                 ',' + str(clasif_test['weighted avg']['recall']) + \
@@ -401,40 +401,40 @@ def main(args):
     line_train = str(rep) + \
                  ',' + str(kfold) + \
                  ',' + str(len(f)) + \
-                 ',' + str(clasif_train['background']['precision']) + \
-                 ',' + str(clasif_train['background']['recall']) + \
-                 ',' + str(clasif_train['background']['f1-score']) + \
-                 ',' + str(clasif_train['background']['support']) + \
+                 ',' + str(clasif_train['label_background']['precision']) + \
+                 ',' + str(clasif_train['label_background']['recall']) + \
+                 ',' + str(clasif_train['label_background']['f1-score']) + \
+                 ',' + str(clasif_train['label_background']['support']) + \
                  ',' + str(roc_auc_train[0]) + \
-                 ',' + str(clasif_train['dos']['precision']) + \
-                 ',' + str(clasif_train['dos']['recall']) + \
-                 ',' + str(clasif_train['dos']['f1-score']) + \
-                 ',' + str(clasif_train['dos']['support']) + \
+                 ',' + str(clasif_train['label_dos']['precision']) + \
+                 ',' + str(clasif_train['label_dos']['recall']) + \
+                 ',' + str(clasif_train['label_dos']['f1-score']) + \
+                 ',' + str(clasif_train['label_dos']['support']) + \
                  ',' + str(roc_auc_train[1]) + \
-                 ',' + str(clasif_train['nerisbotnet']['precision']) + \
-                 ',' + str(clasif_train['nerisbotnet']['recall']) + \
-                 ',' + str(clasif_train['nerisbotnet']['f1-score']) + \
-                 ',' + str(clasif_train['nerisbotnet']['support']) + \
+                 ',' + str(clasif_train['label_nerisbotnet']['precision']) + \
+                 ',' + str(clasif_train['label_nerisbotnet']['recall']) + \
+                 ',' + str(clasif_train['label_nerisbotnet']['f1-score']) + \
+                 ',' + str(clasif_train['label_nerisbotnet']['support']) + \
                  ',' + str(roc_auc_train[2]) + \
-                 ',' + str(clasif_train['scan']['precision']) + \
-                 ',' + str(clasif_train['scan']['recall']) + \
-                 ',' + str(clasif_train['scan']['f1-score']) + \
-                 ',' + str(clasif_train['scan']['support']) + \
+                 ',' + str(clasif_train['label_scan']['precision']) + \
+                 ',' + str(clasif_train['label_scan']['recall']) + \
+                 ',' + str(clasif_train['label_scan']['f1-score']) + \
+                 ',' + str(clasif_train['label_scan']['support']) + \
                  ',' + str(roc_auc_train[3]) + \
-                 ',' + str(clasif_train['sshscan']['precision']) + \
-                 ',' + str(clasif_train['sshscan']['recall']) + \
-                 ',' + str(clasif_train['sshscan']['f1-score']) + \
-                 ',' + str(clasif_train['sshscan']['support']) + \
+                 ',' + str(clasif_train['label_anomaly_sshscan']['precision']) + \
+                 ',' + str(clasif_train['label_anomaly_sshscan']['recall']) + \
+                 ',' + str(clasif_train['label_anomaly_sshscan']['f1-score']) + \
+                 ',' + str(clasif_train['label_anomaly_sshscan']['support']) + \
                  ',' + str(roc_auc_train[4]) + \
-                 ',' + str(clasif_train['udpscan']['precision']) + \
-                 ',' + str(clasif_train['udpscan']['recall']) + \
-                 ',' + str(clasif_train['udpscan']['f1-score']) + \
-                 ',' + str(clasif_train['udpscan']['support']) + \
+                 ',' + str(clasif_train['label_anomaly_udpscan']['precision']) + \
+                 ',' + str(clasif_train['label_anomaly_udpscan']['recall']) + \
+                 ',' + str(clasif_train['label_anomaly_udpscan']['f1-score']) + \
+                 ',' + str(clasif_train['label_anomaly_udpscan']['support']) + \
                  ',' + str(roc_auc_train[5]) + \
-                 ',' + str(clasif_train['spam']['precision']) + \
-                 ',' + str(clasif_train['spam']['recall']) + \
-                 ',' + str(clasif_train['spam']['f1-score']) + \
-                 ',' + str(clasif_train['spam']['support']) + \
+                 ',' + str(clasif_train['label_anomaly_spam']['precision']) + \
+                 ',' + str(clasif_train['label_anomaly_spam']['recall']) + \
+                 ',' + str(clasif_train['label_anomaly_spam']['f1-score']) + \
+                 ',' + str(clasif_train['label_anomaly_spam']['support']) + \
                  ',' + str(roc_auc_train[6]) + \
                  ',' + str(clasif_train['weighted avg']['precision']) + \
                  ',' + str(clasif_train['weighted avg']['recall']) + \
@@ -487,7 +487,7 @@ def main(args):
     print("------------------")
     print("Elapsed time (s): ", elapsedtime)
 
-    print("[+] Finishing task at {0} ({1},{2})".format(datetime.now(),rep,kfold))
+    print("[+] Finishing task at {0} ({1},{2})".format(datetime.now(), rep, kfold))
 
 
 if __name__ == "__main__":
