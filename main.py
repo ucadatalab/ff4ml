@@ -84,20 +84,20 @@ def main(args):
     model=args.model
     rep=args.rep
     kfold=args.kfold
-   # ts=args.exec_ts  # Ejecución en supercomputador
+    ts=args.exec_ts  # Ejecución en supercomputador
 
     instantIni = time.time()
 
     print("[+] Starting task at {0} ({1},{2})".format(datetime.now(),rep,kfold))
 
-    root_path = './data/'
-    root_path_output = './results/'
-  #  root_path = '../data/' # Ejecución en supercomputador
-   # root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
+    #root_path = './data/'
+    #root_path_output = './results/'
+    root_path = '../data/ugr16/dat_batches/' # Ejecución en supercomputador
+    root_path_output = '../results/' + str(ts) + '/' # Ejecución en supercomputador
     
-    mc_file = 'ugr16_multiclass.csv'
-    mcfold_file = 'ugr16_multiclass_folds.csv'
-    mcvars_file = 'ugr16_multiclass_folds_selecvars.csv'
+    mc_file = 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass.csv'
+    mcfold_file = 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass_folds.csv'
+    mcvars_file = 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass_folds_selecvars.csv'
 
     df = pd.read_csv(root_path + mc_file, index_col=0)
     df_folds = pd.read_csv(root_path + mcfold_file)
