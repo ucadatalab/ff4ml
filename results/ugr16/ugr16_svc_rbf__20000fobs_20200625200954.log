@@ -1,0 +1,203 @@
+nohup: ignoring input
+[+] Running experiment 20200625_200954 with rep (1,20) and k-folds (1,5)
+[-] Running task for model: svc, rep: 1, k-fold: 1
+Submitted batch job 7784991
+[-] Running task for model: svc, rep: 1, k-fold: 2
+Submitted batch job 7784992
+[-] Running task for model: svc, rep: 1, k-fold: 3
+Submitted batch job 7784993
+[-] Running task for model: svc, rep: 1, k-fold: 4
+Submitted batch job 7784994
+[-] Running task for model: svc, rep: 1, k-fold: 5
+Submitted batch job 7784995
+[-] Running task for model: svc, rep: 2, k-fold: 1
+Submitted batch job 7784996
+[-] Running task for model: svc, rep: 2, k-fold: 2
+Submitted batch job 7784997
+[-] Running task for model: svc, rep: 2, k-fold: 3
+Submitted batch job 7784999
+[-] Running task for model: svc, rep: 2, k-fold: 4
+Submitted batch job 7785001
+[-] Running task for model: svc, rep: 2, k-fold: 5
+Submitted batch job 7785003
+[-] Running task for model: svc, rep: 3, k-fold: 1
+Submitted batch job 7785005
+[-] Running task for model: svc, rep: 3, k-fold: 2
+Submitted batch job 7785007
+[-] Running task for model: svc, rep: 3, k-fold: 3
+Submitted batch job 7785009
+[-] Running task for model: svc, rep: 3, k-fold: 4
+Submitted batch job 7785011
+[-] Running task for model: svc, rep: 3, k-fold: 5
+Submitted batch job 7785013
+[-] Running task for model: svc, rep: 4, k-fold: 1
+Submitted batch job 7785015
+[-] Running task for model: svc, rep: 4, k-fold: 2
+Submitted batch job 7785017
+[-] Running task for model: svc, rep: 4, k-fold: 3
+Submitted batch job 7785019
+[-] Running task for model: svc, rep: 4, k-fold: 4
+Submitted batch job 7785021
+[-] Running task for model: svc, rep: 4, k-fold: 5
+Submitted batch job 7785023
+[-] Running task for model: svc, rep: 5, k-fold: 1
+Submitted batch job 7785025
+[-] Running task for model: svc, rep: 5, k-fold: 2
+Submitted batch job 7785027
+[-] Running task for model: svc, rep: 5, k-fold: 3
+Submitted batch job 7785029
+[-] Running task for model: svc, rep: 5, k-fold: 4
+Submitted batch job 7785031
+[-] Running task for model: svc, rep: 5, k-fold: 5
+Submitted batch job 7785033
+[-] Running task for model: svc, rep: 6, k-fold: 1
+Submitted batch job 7785035
+[-] Running task for model: svc, rep: 6, k-fold: 2
+Submitted batch job 7785037
+[-] Running task for model: svc, rep: 6, k-fold: 3
+Submitted batch job 7785039
+[-] Running task for model: svc, rep: 6, k-fold: 4
+Submitted batch job 7785041
+[-] Running task for model: svc, rep: 6, k-fold: 5
+Submitted batch job 7785044
+[-] Running task for model: svc, rep: 7, k-fold: 1
+Submitted batch job 7785046
+[-] Running task for model: svc, rep: 7, k-fold: 2
+Submitted batch job 7785047
+[-] Running task for model: svc, rep: 7, k-fold: 3
+Submitted batch job 7785049
+[-] Running task for model: svc, rep: 7, k-fold: 4
+Submitted batch job 7785051
+[-] Running task for model: svc, rep: 7, k-fold: 5
+Submitted batch job 7785054
+[-] Running task for model: svc, rep: 8, k-fold: 1
+Submitted batch job 7785056
+[-] Running task for model: svc, rep: 8, k-fold: 2
+Submitted batch job 7785057
+[-] Running task for model: svc, rep: 8, k-fold: 3
+Submitted batch job 7785060
+[-] Running task for model: svc, rep: 8, k-fold: 4
+Submitted batch job 7785062
+[-] Running task for model: svc, rep: 8, k-fold: 5
+Submitted batch job 7785064
+[-] Running task for model: svc, rep: 9, k-fold: 1
+Submitted batch job 7785065
+[-] Running task for model: svc, rep: 9, k-fold: 2
+Submitted batch job 7785067
+[-] Running task for model: svc, rep: 9, k-fold: 3
+Submitted batch job 7785070
+[-] Running task for model: svc, rep: 9, k-fold: 4
+Submitted batch job 7785072
+[-] Running task for model: svc, rep: 9, k-fold: 5
+Submitted batch job 7785073
+[-] Running task for model: svc, rep: 10, k-fold: 1
+Submitted batch job 7785075
+[-] Running task for model: svc, rep: 10, k-fold: 2
+Submitted batch job 7785077
+[-] Running task for model: svc, rep: 10, k-fold: 3
+Submitted batch job 7785079
+[-] Running task for model: svc, rep: 10, k-fold: 4
+Submitted batch job 7785081
+[-] Running task for model: svc, rep: 10, k-fold: 5
+Submitted batch job 7785083
+[-] Running task for model: svc, rep: 11, k-fold: 1
+Submitted batch job 7785086
+[-] Running task for model: svc, rep: 11, k-fold: 2
+Submitted batch job 7785088
+[-] Running task for model: svc, rep: 11, k-fold: 3
+Submitted batch job 7785090
+[-] Running task for model: svc, rep: 11, k-fold: 4
+Submitted batch job 7785092
+[-] Running task for model: svc, rep: 11, k-fold: 5
+Submitted batch job 7785094
+[-] Running task for model: svc, rep: 12, k-fold: 1
+Submitted batch job 7785096
+[-] Running task for model: svc, rep: 12, k-fold: 2
+Submitted batch job 7785097
+[-] Running task for model: svc, rep: 12, k-fold: 3
+Submitted batch job 7785099
+[-] Running task for model: svc, rep: 12, k-fold: 4
+Submitted batch job 7785101
+[-] Running task for model: svc, rep: 12, k-fold: 5
+Submitted batch job 7785103
+[-] Running task for model: svc, rep: 13, k-fold: 1
+Submitted batch job 7785105
+[-] Running task for model: svc, rep: 13, k-fold: 2
+Submitted batch job 7785108
+[-] Running task for model: svc, rep: 13, k-fold: 3
+Submitted batch job 7785109
+[-] Running task for model: svc, rep: 13, k-fold: 4
+Submitted batch job 7785111
+[-] Running task for model: svc, rep: 13, k-fold: 5
+Submitted batch job 7785113
+[-] Running task for model: svc, rep: 14, k-fold: 1
+Submitted batch job 7785115
+[-] Running task for model: svc, rep: 14, k-fold: 2
+Submitted batch job 7785117
+[-] Running task for model: svc, rep: 14, k-fold: 3
+Submitted batch job 7785119
+[-] Running task for model: svc, rep: 14, k-fold: 4
+Submitted batch job 7785121
+[-] Running task for model: svc, rep: 14, k-fold: 5
+Submitted batch job 7785124
+[-] Running task for model: svc, rep: 15, k-fold: 1
+Submitted batch job 7785125
+[-] Running task for model: svc, rep: 15, k-fold: 2
+Submitted batch job 7785127
+[-] Running task for model: svc, rep: 15, k-fold: 3
+Submitted batch job 7785130
+[-] Running task for model: svc, rep: 15, k-fold: 4
+Submitted batch job 7785131
+[-] Running task for model: svc, rep: 15, k-fold: 5
+Submitted batch job 7785134
+[-] Running task for model: svc, rep: 16, k-fold: 1
+Submitted batch job 7785136
+[-] Running task for model: svc, rep: 16, k-fold: 2
+Submitted batch job 7785138
+[-] Running task for model: svc, rep: 16, k-fold: 3
+Submitted batch job 7785140
+[-] Running task for model: svc, rep: 16, k-fold: 4
+Submitted batch job 7785142
+[-] Running task for model: svc, rep: 16, k-fold: 5
+Submitted batch job 7785144
+[-] Running task for model: svc, rep: 17, k-fold: 1
+Submitted batch job 7785145
+[-] Running task for model: svc, rep: 17, k-fold: 2
+Submitted batch job 7785147
+[-] Running task for model: svc, rep: 17, k-fold: 3
+Submitted batch job 7785149
+[-] Running task for model: svc, rep: 17, k-fold: 4
+Submitted batch job 7785151
+[-] Running task for model: svc, rep: 17, k-fold: 5
+Submitted batch job 7785153
+[-] Running task for model: svc, rep: 18, k-fold: 1
+Submitted batch job 7785155
+[-] Running task for model: svc, rep: 18, k-fold: 2
+Submitted batch job 7785157
+[-] Running task for model: svc, rep: 18, k-fold: 3
+Submitted batch job 7785159
+[-] Running task for model: svc, rep: 18, k-fold: 4
+Submitted batch job 7785162
+[-] Running task for model: svc, rep: 18, k-fold: 5
+Submitted batch job 7785163
+[-] Running task for model: svc, rep: 19, k-fold: 1
+Submitted batch job 7785165
+[-] Running task for model: svc, rep: 19, k-fold: 2
+Submitted batch job 7785167
+[-] Running task for model: svc, rep: 19, k-fold: 3
+Submitted batch job 7785169
+[-] Running task for model: svc, rep: 19, k-fold: 4
+Submitted batch job 7785171
+[-] Running task for model: svc, rep: 19, k-fold: 5
+Submitted batch job 7785173
+[-] Running task for model: svc, rep: 20, k-fold: 1
+Submitted batch job 7785176
+[-] Running task for model: svc, rep: 20, k-fold: 2
+Submitted batch job 7785178
+[-] Running task for model: svc, rep: 20, k-fold: 3
+Submitted batch job 7785180
+[-] Running task for model: svc, rep: 20, k-fold: 4
+Submitted batch job 7785182
+[-] Running task for model: svc, rep: 20, k-fold: 5
+Submitted batch job 7785184
+[+] 100 repetitions have been launched for the experiment 20200625_200954
