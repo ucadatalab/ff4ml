@@ -1,0 +1,7 @@
+label_background [0.         0.25389629 1.        ]
+label_dos [0.0000000e+00 3.8071066e-04 1.0000000e+00]
+label_nerisbotnet [0.00000000e+00 5.06329114e-04 1.00000000e+00]
+label_scan [0.00000000e+00 1.25786164e-04 1.00000000e+00]
+label_anomaly_sshscan [0. 1.]
+label_anomaly_udpscan [0. 0. 1.]
+label_anomaly_spam [0.         0.08736252 1.        ]
