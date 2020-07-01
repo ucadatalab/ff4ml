@@ -26,6 +26,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import label_binarize
 import time
 import json
+import yaml
 
 from utils import fileutils
 from skopt import BayesSearchCV
@@ -46,7 +47,7 @@ def getArguments():
     parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc', 'rf', 'lr'])
     parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
     parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).', type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.')  # Ejecución en supercomputador
+ #   parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.')  # Ejecución en supercomputador
     parser.add_argument('config_file', metavar='Configuration File', help='Yaml based format configuration file path.')
 
     return parser.parse_args()
@@ -71,13 +72,15 @@ def main(args):
     model = args.model
     rep = args.rep
     kfold = args.kfold
+    yaml.warnings({'YAMLLoadWarning': False})
     # ts=args.exec_ts  # Ejecución en supercomputador
     config = fileutils.load_config(args.config_file)
 
     instantIni = time.time()
 
+
     print("[+] Starting task at {0} ({1},{2})".format(datetime.now(), rep, kfold))
-    print(config)
+
     root_path = config['folder_paths']['root_path']
     root_path_output = config['folder_paths']['root_path_output']
     #  root_path = '../data/' # Ejecución en supercomputador
@@ -149,26 +152,32 @@ def main(args):
     elif model == 'svc':
         title = 'SVC'
 
+
+
     print("[+] Computing hyper-parameters for the classifier: " + title + " ...")
     print("")
     if model == 'rf':
         # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
         # parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
-        parameters = {'n_estimators': Integer(500, 600), 'max_features': Integer(2, 16), }
-        model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
+        parameters = {'n_estimators': Integer(config['models_hyper']['rf']['parameters']['n_estimators']['low_val'], config['models_hyper']['rf']['parameters']['n_estimators']['max_val']), 'max_features': Integer(config['models_hyper']['rf']['parameters']['max_features']['low_val'], config['models_hyper']['rf']['parameters']['max_features']['max_val'])}
+       # parameters = {'n_estimators': Integer(500,600), 'max_features': Integer(2,16)}
+      # model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
+        model_grid = RandomForestClassifier(random_state = config['model_grid']['rf']['random_state'], n_jobs = config['model_grid']['rf']['n_jobs'])
 
     elif model == 'svc':
         # parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
         parameters = {
-            'C': Real(0.1, 100, prior='log-uniform'),
-            'gamma': Real(2e-3, 2, prior='log-uniform')
+            'C': Real(config['models_hyper']['svc']['parameters']['C']['low_val'],config['models_hyper']['svc']['parameters']['C']['max_val'], prior='log-uniform'),
+            'gamma': Real(config['models_hyper']['svc']['parameters']['gamma']['low_val'],config['models_hyper']['svc']['parameters']['gamma']['max_val'], prior='log-uniform')
         }
 
-        model_grid = SVC(random_state=0, kernel='rbf')
+        #model_grid = SVC(random_state=0, kernel='rbf')
+        model_grid = SVC(random_state= config['model_grid']['SVC']['random_state'], kernel = config['model_grid']['SVC']['kernel'])
 
     if model != 'lr':
         clf = BayesSearchCV(model_grid, parameters,
-                            n_iter=30, n_jobs=3, cv=5, n_points=8)
+                            # n_iter= 30, n_jobs = 3, cv = 5, n_points = 8)
+                            n_iter= config['hyperpameters']['n_iter'], n_jobs= config['hyperpameters']['n_jobs'],cv = config['hyperpameters']['cv'], n_points= config['hyperpameters']['n_points'])
         # clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
         clf.fit(X_train_scaled, y_train)
         print("")
@@ -204,14 +213,18 @@ def main(args):
         print("Solver: lbfgs")
         print("Multi_class: auto")
         print("Penalty: none")
-        tmodel = LogisticRegression(random_state=0, penalty='none', multi_class='auto',
-                                    solver='lbfgs', verbose=verbose)
+        #tmodel = LogisticRegression(random_state=0, penalty='none', multi_class='auto',
+                                   # solver='lbfgs', verbose=verbose)
+        tmodel = LogisticRegression(random_state= config['model_grid']['lr']['random_state'], penalty = config['model_grid']['lr']['penalty'], multi_class = config['model_grid']['lr']['multi_class'],
+                                    solver= config['model_grid']['lr']['solver'], verbose= config['model_grid']['lr']['verbose'])
+
     elif model == 'svc':
         cs = float(bp.get('C'))
         print("cs: ", cs)
         ga = float(bp.get('gamma'))
         print("ga: ", ga)
         tmodel = clf
+
     # Training models
     print("[+] TRAINING MODELS " + "[+]")
     print("")
@@ -298,7 +311,9 @@ def main(args):
     path_param_output_json_tpr_train = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(
         kfold) + "_" + "output_train" + ".json"
 
-    # Automatically building the header according to the labels.
+
+    '''
+# Automatically building the header according to the labels.
     # head of header
     header = "Rep." + \
              "," + "Kfold" + \
@@ -340,6 +355,97 @@ def main(args):
 
     test_df = pd.DataFrame([1, 2], names=header)
     test_df.to_csv('path.csv')
+    '''
+
+    header = "Rep." + \
+             "," + "Kfold" + \
+             "," + "Num. Vars." + \
+             "," + "Precision-Background" + \
+             "," + "Recall-Background" + \
+             "," + "F1_score_Background" + \
+             "," + "Num. Obs. Background" + \
+             "," + "AUC_Background" + \
+             "," + "Precision-DoS" + \
+             "," + "Recall-DoS" + \
+             "," + "F1_score_DoS" + \
+             "," + "Num. Obs. Dos" + \
+             "," + "AUC_DoS" + \
+             "," + "Precision-Botnet" + \
+             "," + "Recall-Botnet" + \
+             "," + "F1_score_Botnet" + \
+             "," + "Num. Obs. Botnet" + \
+             "," + "AUC_Botnet" + \
+             "," + "Precision-Scan" + \
+             "," + "Recall-Scan" + \
+             "," + "F1_score_Scan" + \
+             "," + "Num. Obs. Scan" + \
+             "," + "AUC_Scan" + \
+             "," + "Precision-SSHscan" + \
+             "," + "Recall-SSHscan" + \
+             "," + "F1_score_SSHscan" + \
+             "," + "Num. Obs. SSHscan" + \
+             "," + "AUC_SSHscan" + \
+             "," + "Precision-UDPscan" + \
+             "," + "Recall-UDPscan" + \
+             "," + "F1_score_UDPscan" + \
+             "," + "Num. Obs. UDPscan" + \
+             "," + "AUC_UDPscan" + \
+             "," + "Precision-Spam" + \
+             "," + "Recall-Spam" + \
+             "," + "F1_score_Spam" + \
+             "," + "Num. Obs. Spam" + \
+             "," + "AUC_Spam" + \
+             "," + "Precision-w" + \
+             "," + "Recall-w" + \
+             "," + "F1_score_w" + \
+             "," + "Total Obs." + \
+             "," + "AUC_w" + \
+             "," + "Time"
+
+    line_test = str(rep) + \
+                ',' + str(kfold) + \
+                ',' + str(len(f)) + \
+                ',' + str(clasif_test['background']['precision']) + \
+                ',' + str(clasif_test['background']['recall']) + \
+                ',' + str(clasif_test['background']['f1-score']) + \
+                ',' + str(clasif_test['background']['support']) + \
+                ',' + str(roc_auc_test[0]) + \
+                ',' + str(clasif_test['dos']['precision']) + \
+                ',' + str(clasif_test['dos']['recall']) + \
+                ',' + str(clasif_test['dos']['f1-score']) + \
+                ',' + str(clasif_test['dos']['support']) + \
+                ',' + str(roc_auc_test[1]) + \
+                ',' + str(clasif_test['nerisbotnet']['precision']) + \
+                ',' + str(clasif_test['nerisbotnet']['recall']) + \
+                ',' + str(clasif_test['nerisbotnet']['f1-score']) + \
+                ',' + str(clasif_test['nerisbotnet']['support']) + \
+                ',' + str(roc_auc_test[2]) + \
+                ',' + str(clasif_test['scan']['precision']) + \
+                ',' + str(clasif_test['scan']['recall']) + \
+                ',' + str(clasif_test['scan']['f1-score']) + \
+                ',' + str(clasif_test['scan']['support']) + \
+                ',' + str(roc_auc_test[3]) + \
+                ',' + str(clasif_test['sshscan']['precision']) + \
+                ',' + str(clasif_test['sshscan']['recall']) + \
+                ',' + str(clasif_test['sshscan']['f1-score']) + \
+                ',' + str(clasif_test['sshscan']['support']) + \
+                ',' + str(roc_auc_test[4]) + \
+                ',' + str(clasif_test['udpscan']['precision']) + \
+                ',' + str(clasif_test['udpscan']['recall']) + \
+                ',' + str(clasif_test['udpscan']['f1-score']) + \
+                ',' + str(clasif_test['udpscan']['support']) + \
+                ',' + str(roc_auc_test[5]) + \
+                ',' + str(clasif_test['spam']['precision']) + \
+                ',' + str(clasif_test['spam']['recall']) + \
+                ',' + str(clasif_test['spam']['f1-score']) + \
+                ',' + str(clasif_test['spam']['support']) + \
+                ',' + str(roc_auc_test[6]) + \
+                ',' + str(clasif_test['weighted avg']['precision']) + \
+                ',' + str(clasif_test['weighted avg']['recall']) + \
+                ',' + str(clasif_test['weighted avg']['f1-score']) + \
+                ',' + str(clasif_test['weighted avg']['support']) + \
+                ',' + str(auc_w_test) + \
+                ',' + str(elapsedtime)
 
     line_train = str(rep) + \
                  ',' + str(kfold) + \
@@ -386,19 +492,10 @@ def main(args):
                  ',' + str(auc_w_train) + \
                  ',' + str(elapsedtime)
 
-    #write_param(path_param_output_test, line_test, header)
-    #write_param(path_param_output_train, line_train, header)
+    write_param(path_param_output_test, line_test, header)
+    write_param(path_param_output_train, line_train, header)
 
     # Send data to .json
-
-    names = []
-    names.append('Background')
-    names.append('DoS')
-    names.append('Botnet')
-    names.append('Scan')
-    names.append('SSHscan')
-    names.append('UDPscan')
-    names.append('Spam')
 
     with open(path_param_output_json_fpr_test, "w") as fpr_dict:
         for name, value in fpr_test.items():
