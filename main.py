@@ -159,25 +159,26 @@ def main(args):
     if model == 'rf':
         # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
         # parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
-        parameters = {'n_estimators': Integer(config['models_hyper']['rf']['parameters']['n_estimators']['low_val'], config['models_hyper']['rf']['parameters']['n_estimators']['max_val']), 'max_features': Integer(config['models_hyper']['rf']['parameters']['max_features']['low_val'], config['models_hyper']['rf']['parameters']['max_features']['max_val'])}
-       # parameters = {'n_estimators': Integer(500,600), 'max_features': Integer(2,16)}
-      # model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
-        model_grid = RandomForestClassifier(random_state = config['model_grid']['rf']['random_state'], n_jobs = config['model_grid']['rf']['n_jobs'])
+        parameters = {'n_estimators': Integer(config['models_hyper']['rf']['parameters']['n_estimators']['low_val'],config['models_hyper']['rf']['parameters']['n_estimators']['max_val']), 'max_features': Integer(config['models_hyper']['rf']['parameters']['max_features']['low_val'],config['models_hyper']['rf']['parameters']['max_features']['max_val'])}
+        # parameters = {'n_estimators': Integer(500,600), 'max_features': Integer(2,16)}
+        # model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
+        model_grid = RandomForestClassifier(random_state = config['model_grid']['rf']['random_state'],n_jobs = config['model_grid']['rf']['n_jobs'])
 
     elif model == 'svc':
         # parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
         parameters = {
             'C': Real(config['models_hyper']['svc']['parameters']['C']['low_val'],config['models_hyper']['svc']['parameters']['C']['max_val'], prior='log-uniform'),
-            'gamma': Real(config['models_hyper']['svc']['parameters']['gamma']['low_val'],config['models_hyper']['svc']['parameters']['gamma']['max_val'], prior='log-uniform')
+            'gamma': Real(2e-3, 2, prior='log-uniform')
+            # 'models_hyper']['svc']['parameters']['gamma']['low_val'], config['models_hyper']['svc']['parameters']['gamma']['max_val'], prior='log-uniform')
         }
 
-        #model_grid = SVC(random_state=0, kernel='rbf')
-        model_grid = SVC(random_state= config['model_grid']['SVC']['random_state'], kernel = config['model_grid']['SVC']['kernel'])
+        # model_grid = SVC(random_state=0, kernel='rbf')
+        model_grid = SVC(random_state= config['model_grid']['svc']['random_state'], kernel = config['model_grid']['svc']['kernel'])
 
     if model != 'lr':
         clf = BayesSearchCV(model_grid, parameters,
-                            # n_iter= 30, n_jobs = 3, cv = 5, n_points = 8)
-                            n_iter= config['hyperpameters']['n_iter'], n_jobs= config['hyperpameters']['n_jobs'],cv = config['hyperpameters']['cv'], n_points= config['hyperpameters']['n_points'])
+                            n_iter= config['hyperparameters']['n_iter'], n_jobs= config['hyperparameters']['n_jobs'], cv = config['hyperparameters']['cv'], n_points= config['hyperparameters']['n_points'])
+                            # n_iter = 30, n_jobs = 3, cv = 5, n_points = 8)
         # clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
         clf.fit(X_train_scaled, y_train)
         print("")
@@ -215,6 +216,7 @@ def main(args):
         print("Penalty: none")
         #tmodel = LogisticRegression(random_state=0, penalty='none', multi_class='auto',
                                    # solver='lbfgs', verbose=verbose)
+        print("TMODEL")
         tmodel = LogisticRegression(random_state= config['model_grid']['lr']['random_state'], penalty = config['model_grid']['lr']['penalty'], multi_class = config['model_grid']['lr']['multi_class'],
                                     solver= config['model_grid']['lr']['solver'], verbose= config['model_grid']['lr']['verbose'])
 
