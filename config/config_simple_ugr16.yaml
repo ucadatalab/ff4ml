@@ -14,51 +14,53 @@ labels:
   - udpscan
   - spam
 
-
+# Root folders
 folder_paths:
   root_path: './data/'
   root_path_output: './results/'
 
+# Data paths
 file_paths:
   mc_file: 'ugr16_multiclass.csv'
   mcfold_file: 'ugr16_multiclass_folds.csv'
   mcvars_file: 'ugr16_multiclass_folds_selecvars.csv'
 
-
-hyperparameters:
+# Bayesian based hyper-parameter selection
+hyper_bayesina:
   n_iter: 30
   n_jobs: 3
   cv: 5
   n_points: 8
 
-
-models_hyper:
+# Model's configuration
+models:
   svc:
-    parameters:
+    hyperparametros:
       C:
-        low_val: 0.1
-        max_val: 100
+        - 0.1
+        - 100
       gamma:
-        low_val: 2e-3
-        max_val: 2
+        - 2e-3
+        - 2
+      kernel: 'rbf'
+
+    general:
+      random_state: 0
+      verbose: false
+
   rf:
     parameters:
       n_estimators:
-        low_val: 500
-        max_val: 600
+        - 500
+        - 600
       max_features:
-        low_val: 2
-        max_val: 16
+        - 2 # low value
+        - 16
+    general:
+      random_state: 0
+      n_jobs: 2
+      verbose: false
 
-
-
-model_grid:
-  svc:
-    random_state: 0
-    kernel: 'rbf'
-  rf:
-    random_state: 0
-    n_jobs: 2
   lr:
     random_state: 0
     penalty: 'none'
