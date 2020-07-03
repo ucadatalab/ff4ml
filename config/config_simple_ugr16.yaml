@@ -26,7 +26,7 @@ file_paths:
   mcvars_file: 'ugr16_multiclass_folds_selecvars.csv'
 
 # Bayesian based hyper-parameter selection
-hyper_bayesina:
+hyper_bayesian:
   n_iter: 30
   n_jobs: 3
   cv: 5
@@ -35,7 +35,7 @@ hyper_bayesina:
 # Model's configuration
 models:
   svc:
-    hyperparametros:
+    hyperparameters:
       C:
         - 0.1
         - 100
@@ -51,11 +51,11 @@ models:
   rf:
     parameters:
       n_estimators:
-        - 500
-        - 600
+        - 500 # low value
+        - 600 # high value
       max_features:
         - 2 # low value
-        - 16
+        - 16 # high value
     general:
       random_state: 0
       n_jobs: 2
@@ -67,10 +67,3 @@ models:
     multi_class: 'auto'
     solver: 'lbfgs'
     verbose: false
-
-
-
-
-
-
-
