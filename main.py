@@ -32,9 +32,6 @@ from utils import fileutils
 from skopt import BayesSearchCV
 from skopt.space import Real, Categorical, Integer
 
-# Models verbose
-verbose = False
-
 
 def getArguments():
     """
@@ -51,21 +48,6 @@ def getArguments():
     parser.add_argument('config_file', metavar='Configuration File', help='Yaml based format configuration file path.')
 
     return parser.parse_args()
-
-
-def write_param(path_param, line, header):
-    if os.path.isfile(path_param):
-        file = open(path_param, "a")
-    else:
-        file = open(path_param, "w")
-        file.write(header)
-        file.write("\n")
-
-    file.write(line)
-    file.write("\n")
-
-    file.close()
-    print("[+] Line added ...")
 
 
 def main(args):
@@ -99,7 +81,8 @@ def main(args):
     print("[-]" + mcfold_file + " OK")
     print("[-]" + mcvars_file + " OK")
 
-    # Feature selection
+# Feature selection
+
     d = (df_vars.groupby('repeticion').groups[rep]) & (df_vars.groupby('caja.de.test').groups[kfold])
 
     size = df_vars.shape[1]
@@ -113,37 +96,40 @@ def main(args):
     if kfold == 1:
         f.remove("caja.de.test")
 
-    # Data separation and label
+# Data separation and label
+
     X = df[f]
     y = df['outcome.multiclass']
 
-    # Creation of TRAINING and TEST datasets according to the number of fold.
-    group = 'REP.' + str(rep)
+# Creation of TRAINING and TEST datasets according to the number of fold
 
+    group = 'REP.' + str(rep)
     rows_fold = df_folds.iloc[df_folds.groupby(group).groups[kfold]].index
     No_rows_fold = df_folds[df_folds[group] != kfold][group].index
 
-    # Getting labels from config file
+# Getting labels from config file
+
     labels = config['labels']
 
-    # Data TRAIN and LABEL
+# Data TRAIN and LABEL
+
     X_train = X.drop(X.index[rows_fold])
     y_train = y.drop(y.index[rows_fold])
     y_train_bina = label_binarize(y_train, classes=labels)
 
-    # Data TEST and LABEL
+# Data TEST and LABEL
+
     X_test = X.drop(X.index[No_rows_fold])
     y_test = y.drop(y.index[No_rows_fold])
     y_test_bina = label_binarize(y_test, classes=labels)
-
     n_classes = len(labels)
 
-    # Data normalization
+# Data normalization
 
     X_train_scaled = StandardScaler().fit_transform(X_train)
     X_test_scaled = StandardScaler().fit_transform(X_test)
 
-    # Hyperparameters Selection
+# Hyperparameters Selection
 
     if model == 'lr':
         title = 'LOGISTIC REGRESSION'
@@ -152,34 +138,31 @@ def main(args):
     elif model == 'svc':
         title = 'SVC'
 
-
-
     print("[+] Computing hyper-parameters for the classifier: " + title + " ...")
     print("")
     if model == 'rf':
         # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
         # parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
-        parameters = {'n_estimators': Integer(config['models_hyper']['rf']['parameters']['n_estimators']['low_val'],config['models_hyper']['rf']['parameters']['n_estimators']['max_val']), 'max_features': Integer(config['models_hyper']['rf']['parameters']['max_features']['low_val'],config['models_hyper']['rf']['parameters']['max_features']['max_val'])}
+        parameters = {'n_estimators': Integer(config['models']['rf']['parameters']['n_estimators'][0],config['models']['rf']['parameters']['n_estimators'][1]), 'max_features': Integer(config['models']['rf']['parameters']['max_features'][0],config['models']['rf']['parameters']['max_features'][1])}
         # parameters = {'n_estimators': Integer(500,600), 'max_features': Integer(2,16)}
         # model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
-        model_grid = RandomForestClassifier(random_state = config['model_grid']['rf']['random_state'],n_jobs = config['model_grid']['rf']['n_jobs'])
+        model_grid = RandomForestClassifier(random_state = config['models']['rf']['general']['random_state'],n_jobs = config['models']['rf']['general']['n_jobs'])
 
     elif model == 'svc':
         # parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
         parameters = {
-            'C': Real(config['models_hyper']['svc']['parameters']['C']['low_val'],config['models_hyper']['svc']['parameters']['C']['max_val'], prior='log-uniform'),
-            'gamma': Real(2e-3, 2, prior='log-uniform')
+            'C': Real(config['models']['svc']['hyperparameters']['C'][0],config['models']['svc']['hyperparameters']['C'][1], prior='log-uniform'),
+            'gamma': Real(float(config['models']['svc']['hyperparameters']['gamma'][0]), config['models']['svc']['hyperparameters']['gamma'][1], prior='log-uniform')
             # 'models_hyper']['svc']['parameters']['gamma']['low_val'], config['models_hyper']['svc']['parameters']['gamma']['max_val'], prior='log-uniform')
         }
-
+        #2e-3
         # model_grid = SVC(random_state=0, kernel='rbf')
-        model_grid = SVC(random_state= config['model_grid']['svc']['random_state'], kernel = config['model_grid']['svc']['kernel'])
+        model_grid = SVC(random_state= config['models']['svc']['general']['random_state'], kernel = config['models']['svc']['hyperparameters']['kernel'])
 
     if model != 'lr':
         clf = BayesSearchCV(model_grid, parameters,
-                            n_iter= config['hyperparameters']['n_iter'], n_jobs= config['hyperparameters']['n_jobs'], cv = config['hyperparameters']['cv'], n_points= config['hyperparameters']['n_points'])
+                            n_iter= config['hyper_bayesian']['n_iter'], n_jobs= config['hyper_bayesian']['n_jobs'], cv = config['hyper_bayesian']['cv'], n_points= config['hyper_bayesian']['n_points'])
                             # n_iter = 30, n_jobs = 3, cv = 5, n_points = 8)
-        # clf = GridSearchCV(model_grid, parameters, cv=5, verbose=verbose)
         clf.fit(X_train_scaled, y_train)
         print("")
         print("[+] The best parameters for " + "Rep.: " + str(rep) + " and Kfold: " + str(kfold) + " are:  [+]")
@@ -187,7 +170,7 @@ def main(args):
         print("")
         bp = clf.best_params_
 
-        # Save selected parameters to .json
+# Save selected parameters to .json
 
         path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(
             kfold) + "_" + "output" + ".json"
@@ -196,7 +179,7 @@ def main(args):
 
         print("---BEST PARAMETERS SAVED ---")
 
-    # PARAMETERS SELECTED
+# Parameters selected
 
     print("[+] PARAMETERS SELECTED MODEL " + title + " [+]")
     print("")
@@ -217,9 +200,8 @@ def main(args):
         #tmodel = LogisticRegression(random_state=0, penalty='none', multi_class='auto',
                                    # solver='lbfgs', verbose=verbose)
         print("TMODEL")
-        tmodel = LogisticRegression(random_state= config['model_grid']['lr']['random_state'], penalty = config['model_grid']['lr']['penalty'], multi_class = config['model_grid']['lr']['multi_class'],
-                                    solver= config['model_grid']['lr']['solver'], verbose= config['model_grid']['lr']['verbose'])
-
+        tmodel = LogisticRegression(random_state= config['models']['lr']['random_state'], penalty = config['models']['lr']['penalty'], multi_class = config['models']['lr']['multi_class'],
+                                    solver= config['models']['lr']['solver'], verbose= config['models']['lr']['verbose'])
     elif model == 'svc':
         cs = float(bp.get('C'))
         print("cs: ", cs)
@@ -227,7 +209,8 @@ def main(args):
         print("ga: ", ga)
         tmodel = clf
 
-    # Training models
+# Training models
+
     print("[+] TRAINING MODELS " + "[+]")
     print("")
     print("[+] Model Training: " + title + "\n")
@@ -250,16 +233,17 @@ def main(args):
     print(classification_report(y_train_bina, predictions_train, target_names=labels))
     print("")
 
-    # Compute ROC area for each class TEST
+# Compute ROC area for each class TEST
+
     fpr_test = dict()
     tpr_test = dict()
     roc_auc_test = dict()
-
     for i in range(n_classes):
         fpr_test[i], tpr_test[i], _ = roc_curve(y_test_bina[:, i], predictions_test[:, i])
         roc_auc_test[i] = auc(fpr_test[i], tpr_test[i])
 
-    # Compute per class ROCs and AUCs
+# Compute per class ROCs and AUCs
+
     supports_sum_test = 0
     auc_partial_test = 0
 
@@ -272,7 +256,8 @@ def main(args):
     print("AUC_W TEST: ", auc_w_test)
     print("")
 
-    # Compute ROC area for each class TRAIN
+# Compute ROC area for each class TRAIN
+
     fpr_train = dict()
     tpr_train = dict()
     roc_auc_train = dict()
@@ -281,7 +266,8 @@ def main(args):
         fpr_train[i], tpr_train[i], _ = roc_curve(y_train_bina[:, i], predictions_train[:, i])
         roc_auc_train[i] = auc(fpr_train[i], tpr_train[i])
 
-    # Compute per class ROCs and AUCs
+# Compute per class ROCs and AUCs
+
     supports_sum_train = 0
     auc_partial_train = 0
 
@@ -294,11 +280,13 @@ def main(args):
     print("AUC_W TRAIN: ", auc_w_train)
     print("")
 
-    # Send data to .csv
+# Elapsed time in seconds
 
     instantFinal = time.time()
-    # elapsed time in seconds
     elapsedtime = instantFinal - instantIni
+
+# Output paths
+
     path_param_output_test = root_path_output + model + "_" + str(rep) + "_" + str(kfold) + "_" + "output_test" + ".csv"
     path_param_output_train = root_path_output + model + "_" + str(rep) + "_" + str(
         kfold) + "_" + "output_train" + ".csv"
@@ -314,32 +302,49 @@ def main(args):
         kfold) + "_" + "output_train" + ".json"
 
 
-    '''
+
 # Automatically building the header according to the labels.
-    # head of header
+
+
+    # Head of header
+
+    h = []
+    h.append("Rep")
+    h.append("Kfold")
+    h.append("Num. Vars.")
+
     header = "Rep." + \
              "," + "Kfold" + \
              "," + "Num. Vars."
 
-    # body of header
+    # Body of header
+
     for label in labels:
-        header = header + \
-                 "," + "Precision-" + label + \
-                 "," + "Recall-" + label + \
-                 "," + "F1_score_" + label + \
-                 "," + "Num. Obs. " + label + \
-                 "," + "AUC_" + label
+        l = "Precision-" + label
+        h.append(l)
+        l = "Recall-" + label
+        h.append(l)
+        l = "F1_score_" + label
+        h.append(l)
+        l = "Num. Obs. " + label
+        h.append (l)
+        l = "AUC_" + label
+        h.append(l)
 
-    # tail of header
-    header = header + \
-             "," + "Precision-w" + \
-             "," + "Recall-w" + \
-             "," + "F1_score_w" + \
-             "," + "Total Obs." + \
-             "," + "AUC_w" + \
-             "," + "Time"
+    # Tail of header
 
-    # TEST RESULTS
+    h.append("Precision-w")
+    h.append("Recall-w")
+    h.append("F1_score_w")
+    h.append ("Total Obs.")
+    h.append("AUC_w")
+    h.append("Time")
+    print("HR: ", h)
+    print("HR_LE", len(h))
+
+
+    # Test results to .csv
+
     line_test = []
     line_test.append(rep)
     line_test.append(kfold)
@@ -352,152 +357,48 @@ def main(args):
         line_test.append(clasif_test[label]['support'])
         line_test.append(roc_auc_test[i])
 
+    line_test.append(clasif_test['weighted avg']['precision'])
+    line_test.append(clasif_test['weighted avg']['recall'])
+    line_test.append(clasif_test['weighted avg']['f1-score'])
+    line_test.append(clasif_test['weighted avg']['support'])
     line_test.append(auc_w_test)
     line_test.append(elapsedtime)
 
-    test_df = pd.DataFrame([1, 2], names=header)
-    test_df.to_csv('path.csv')
-    '''
 
-    header = "Rep." + \
-             "," + "Kfold" + \
-             "," + "Num. Vars." + \
-             "," + "Precision-Background" + \
-             "," + "Recall-Background" + \
-             "," + "F1_score_Background" + \
-             "," + "Num. Obs. Background" + \
-             "," + "AUC_Background" + \
-             "," + "Precision-DoS" + \
-             "," + "Recall-DoS" + \
-             "," + "F1_score_DoS" + \
-             "," + "Num. Obs. Dos" + \
-             "," + "AUC_DoS" + \
-             "," + "Precision-Botnet" + \
-             "," + "Recall-Botnet" + \
-             "," + "F1_score_Botnet" + \
-             "," + "Num. Obs. Botnet" + \
-             "," + "AUC_Botnet" + \
-             "," + "Precision-Scan" + \
-             "," + "Recall-Scan" + \
-             "," + "F1_score_Scan" + \
-             "," + "Num. Obs. Scan" + \
-             "," + "AUC_Scan" + \
-             "," + "Precision-SSHscan" + \
-             "," + "Recall-SSHscan" + \
-             "," + "F1_score_SSHscan" + \
-             "," + "Num. Obs. SSHscan" + \
-             "," + "AUC_SSHscan" + \
-             "," + "Precision-UDPscan" + \
-             "," + "Recall-UDPscan" + \
-             "," + "F1_score_UDPscan" + \
-             "," + "Num. Obs. UDPscan" + \
-             "," + "AUC_UDPscan" + \
-             "," + "Precision-Spam" + \
-             "," + "Recall-Spam" + \
-             "," + "F1_score_Spam" + \
-             "," + "Num. Obs. Spam" + \
-             "," + "AUC_Spam" + \
-             "," + "Precision-w" + \
-             "," + "Recall-w" + \
-             "," + "F1_score_w" + \
-             "," + "Total Obs." + \
-             "," + "AUC_w" + \
-             "," + "Time"
+    data_test=pd.DataFrame(line_test,h)
+    data_test= data_test.T
+    data_test.to_csv(path_param_output_test)
 
-    line_test = str(rep) + \
-                ',' + str(kfold) + \
-                ',' + str(len(f)) + \
-                ',' + str(clasif_test['background']['precision']) + \
-                ',' + str(clasif_test['background']['recall']) + \
-                ',' + str(clasif_test['background']['f1-score']) + \
-                ',' + str(clasif_test['background']['support']) + \
-                ',' + str(roc_auc_test[0]) + \
-                ',' + str(clasif_test['dos']['precision']) + \
-                ',' + str(clasif_test['dos']['recall']) + \
-                ',' + str(clasif_test['dos']['f1-score']) + \
-                ',' + str(clasif_test['dos']['support']) + \
-                ',' + str(roc_auc_test[1]) + \
-                ',' + str(clasif_test['nerisbotnet']['precision']) + \
-                ',' + str(clasif_test['nerisbotnet']['recall']) + \
-                ',' + str(clasif_test['nerisbotnet']['f1-score']) + \
-                ',' + str(clasif_test['nerisbotnet']['support']) + \
-                ',' + str(roc_auc_test[2]) + \
-                ',' + str(clasif_test['scan']['precision']) + \
-                ',' + str(clasif_test['scan']['recall']) + \
-                ',' + str(clasif_test['scan']['f1-score']) + \
-                ',' + str(clasif_test['scan']['support']) + \
-                ',' + str(roc_auc_test[3]) + \
-                ',' + str(clasif_test['sshscan']['precision']) + \
-                ',' + str(clasif_test['sshscan']['recall']) + \
-                ',' + str(clasif_test['sshscan']['f1-score']) + \
-                ',' + str(clasif_test['sshscan']['support']) + \
-                ',' + str(roc_auc_test[4]) + \
-                ',' + str(clasif_test['udpscan']['precision']) + \
-                ',' + str(clasif_test['udpscan']['recall']) + \
-                ',' + str(clasif_test['udpscan']['f1-score']) + \
-                ',' + str(clasif_test['udpscan']['support']) + \
-                ',' + str(roc_auc_test[5]) + \
-                ',' + str(clasif_test['spam']['precision']) + \
-                ',' + str(clasif_test['spam']['recall']) + \
-                ',' + str(clasif_test['spam']['f1-score']) + \
-                ',' + str(clasif_test['spam']['support']) + \
-                ',' + str(roc_auc_test[6]) + \
-                ',' + str(clasif_test['weighted avg']['precision']) + \
-                ',' + str(clasif_test['weighted avg']['recall']) + \
-                ',' + str(clasif_test['weighted avg']['f1-score']) + \
-                ',' + str(clasif_test['weighted avg']['support']) + \
-                ',' + str(auc_w_test) + \
-                ',' + str(elapsedtime)
 
-    line_train = str(rep) + \
-                 ',' + str(kfold) + \
-                 ',' + str(len(f)) + \
-                 ',' + str(clasif_train['background']['precision']) + \
-                 ',' + str(clasif_train['background']['recall']) + \
-                 ',' + str(clasif_train['background']['f1-score']) + \
-                 ',' + str(clasif_train['background']['support']) + \
-                 ',' + str(roc_auc_train[0]) + \
-                 ',' + str(clasif_train['dos']['precision']) + \
-                 ',' + str(clasif_train['dos']['recall']) + \
-                 ',' + str(clasif_train['dos']['f1-score']) + \
-                 ',' + str(clasif_train['dos']['support']) + \
-                 ',' + str(roc_auc_train[1]) + \
-                 ',' + str(clasif_train['nerisbotnet']['precision']) + \
-                 ',' + str(clasif_train['nerisbotnet']['recall']) + \
-                 ',' + str(clasif_train['nerisbotnet']['f1-score']) + \
-                 ',' + str(clasif_train['nerisbotnet']['support']) + \
-                 ',' + str(roc_auc_train[2]) + \
-                 ',' + str(clasif_train['scan']['precision']) + \
-                 ',' + str(clasif_train['scan']['recall']) + \
-                 ',' + str(clasif_train['scan']['f1-score']) + \
-                 ',' + str(clasif_train['scan']['support']) + \
-                 ',' + str(roc_auc_train[3]) + \
-                 ',' + str(clasif_train['sshscan']['precision']) + \
-                 ',' + str(clasif_train['sshscan']['recall']) + \
-                 ',' + str(clasif_train['sshscan']['f1-score']) + \
-                 ',' + str(clasif_train['sshscan']['support']) + \
-                 ',' + str(roc_auc_train[4]) + \
-                 ',' + str(clasif_train['udpscan']['precision']) + \
-                 ',' + str(clasif_train['udpscan']['recall']) + \
-                 ',' + str(clasif_train['udpscan']['f1-score']) + \
-                 ',' + str(clasif_train['udpscan']['support']) + \
-                 ',' + str(roc_auc_train[5]) + \
-                 ',' + str(clasif_train['spam']['precision']) + \
-                 ',' + str(clasif_train['spam']['recall']) + \
-                 ',' + str(clasif_train['spam']['f1-score']) + \
-                 ',' + str(clasif_train['spam']['support']) + \
-                 ',' + str(roc_auc_train[6]) + \
-                 ',' + str(clasif_train['weighted avg']['precision']) + \
-                 ',' + str(clasif_train['weighted avg']['recall']) + \
-                 ',' + str(clasif_train['weighted avg']['f1-score']) + \
-                 ',' + str(clasif_train['weighted avg']['support']) + \
-                 ',' + str(auc_w_train) + \
-                 ',' + str(elapsedtime)
 
-    write_param(path_param_output_test, line_test, header)
-    write_param(path_param_output_train, line_train, header)
+    # Train results to .csv
 
-    # Send data to .json
+    line_train = []
+    line_train.append(rep)
+    line_train.append(kfold)
+    line_train.append(len(f)) # Number of selected variables
+
+    for i,label in enumerate(labels):
+        line_train.append(clasif_train[label]['precision'])
+        line_train.append(clasif_train[label]['recall'])
+        line_train.append(clasif_train[label]['f1-score'])
+        line_train.append(clasif_train[label]['support'])
+        line_train.append(roc_auc_train[i])
+
+    line_train.append(clasif_test['weighted avg']['precision'])
+    line_train.append(clasif_test['weighted avg']['recall'])
+    line_train.append(clasif_test['weighted avg']['f1-score'])
+    line_train.append(clasif_test['weighted avg']['support'])
+    line_train.append(auc_w_test)
+    line_train.append(elapsedtime)
+
+
+    data_train=pd.DataFrame(line_train,h)
+    data_train= data_train.T
+    data_train.to_csv(path_param_output_train)
+
+
+# Send data to .json
 
     with open(path_param_output_json_fpr_test, "w") as fpr_dict:
         for name, value in fpr_test.items():
