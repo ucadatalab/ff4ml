@@ -164,17 +164,22 @@ def main(args):
     if model == 'rf':
         # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
         # parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
-        parameters = {'n_estimators': Integer(500, 600), 'max_features': Integer(2, 16), }
+        parameters = {'n_estimators': Integer(600, 800), 'max_features': Integer(2, 16), }
         model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
 
     elif model == 'svc':
         # parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
+        # RBF 
+        #parameters = {
+        #    'C': Real(0.1, 100, prior='log-uniform'),
+        #    'gamma': Real(0.125, 2, prior='log-uniform')
+        #}
+        # Linear
         parameters = {
-            'C': Real(0.1, 100, prior='log-uniform'),
-            'gamma': Real(2e-3, 2, prior='log-uniform')
+            'C': Real(0.1, 100, prior='log-uniform')
         }
 
-        model_grid = SVC(random_state=0, kernel='rbf')
+        model_grid = SVC(random_state=0, kernel='linear')
 
     if model != 'lr':
         clf = BayesSearchCV(model_grid, parameters,
@@ -202,10 +207,10 @@ def main(args):
     print("")
     if model == 'rf':
         # md = int(bp.get('max_depth'))
-        mf = int(bp.get('max_features'))
-        ne = int(bp.get('n_estimators'))
-        print("Max_Features: ", mf)
-        print("n_estimators: ", ne)
+        #mf = int(bp.get('max_features'))
+        #ne = int(bp.get('n_estimators'))
+        #print("Max_Features: ", mf)
+        #print("n_estimators: ", ne)
         # nit = int(bp.get('n_estimators'))
         # print("N_Estimators: ", nit)
         # tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
@@ -217,10 +222,10 @@ def main(args):
         tmodel = LogisticRegression(random_state=0, penalty='none', multi_class='auto',
                                     solver='lbfgs', verbose=verbose)
     elif model == 'svc':
-        cs = float(bp.get('C'))
-        print("cs: ", cs)
-        ga = float(bp.get('gamma'))
-        print("ga: ", ga)
+        #cs = float(bp.get('C'))
+        #print("cs: ", cs)
+        #ga = float(bp.get('gamma'))
+        #print("ga: ", ga)
         tmodel = clf
     # Training models
     print("[+] TRAINING MODELS " + "[+]")
