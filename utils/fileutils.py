@@ -12,6 +12,7 @@
 """
 
 import yaml
+import json
 
 
 def load_config(path_to_config_file):
@@ -45,3 +46,26 @@ def load_config(path_to_config_file):
     return configuration
 
 
+def params_to_json(bp, path_to_json):
+    """
+    Dumps model parameters to a JSON file.
+
+    Parameters
+    ----------
+    bp: dict
+        Best selected parameters.
+    path_to_json: str
+        Path to the json file
+
+    Raise
+    -----
+    e: Exception
+        If something was wrong.
+
+    """
+    try:
+        with open(path_to_json, "w") as fi:
+            json.dump(bp, fi)
+    except Exception as e:
+        print("There was an ERROR writing on file " + path_to_json)
+        raise e

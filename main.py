@@ -12,8 +12,6 @@
 
 import argparse
 import pandas as pd
-import os
-import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
@@ -22,15 +20,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_curve, roc_auc_score, auc
 from sklearn.metrics import classification_report
 from datetime import datetime
-from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import label_binarize
 import time
-import json
 import yaml
 
 from utils import fileutils
 from skopt import BayesSearchCV
-from skopt.space import Real, Categorical, Integer
+from skopt.space import Real, Integer
+
 
 def getArguments():
     """
@@ -96,7 +93,7 @@ def main(args):
 # Data separation and label
 
     X = df[f]
-    y = df['outcome.multiclass']
+    y = df['outcome']
 
 # Creation of TRAINING and TEST datasets according to the number of fold
 
@@ -136,31 +133,39 @@ def main(args):
     elif model == 'svc':
         title = 'SVC'
 
-    print("[+] Computing hyper-parameters for the classifier: " + title + " ...")
-    print("")
     if model == 'rf':
-        # parameters = {'n_estimators': [2, 4, 8, 16, 32], 'max_depth': [2, 4, 8, 16]}
-        # parameters = {'n_estimators': 500, 'max_features': [2, 4, 8, 16]}
-        parameters = {'n_estimators': Integer(config['models']['rf']['parameters']['n_estimators'][0],config['models']['rf']['parameters']['n_estimators'][1]), 'max_features': Integer(config['models']['rf']['parameters']['max_features'][0],config['models']['rf']['parameters']['max_features'][1])}
-        # parameters = {'n_estimators': Integer(500,600), 'max_features': Integer(2,16)}
-        # model_grid = RandomForestClassifier(random_state=0, n_jobs=2)
-        model_grid = RandomForestClassifier(random_state = config['models']['rf']['general']['random_state'],n_jobs = config['models']['rf']['general']['n_jobs'])
+        parameters = {'n_estimators': Integer(config['models']['rf']['parameters']['n_estimators'][0],
+                                              config['models']['rf']['parameters']['n_estimators'][1]),
+                      'max_features': Integer(config['models']['rf']['parameters']['max_features'][0],
+                                              config['models']['rf']['parameters']['max_features'][1])}
+        model_grid = RandomForestClassifier(random_state = config['models']['rf']['general']['random_state'],
+                                            n_jobs = config['models']['rf']['general']['n_jobs'])
 
     elif model == 'svc':
-        # parameters = {'gamma': [2 ** -3, 2 ** -2, 2 ** -1, 2 ** 0, 2 ** 1], 'C': [0.1, 1, 10, 100]}
         parameters = {
-            'C': Real(config['models']['svc']['hyperparameters']['C'][0],config['models']['svc']['hyperparameters']['C'][1], prior='log-uniform'),
-            'gamma': Real(float(config['models']['svc']['hyperparameters']['gamma'][0]), config['models']['svc']['hyperparameters']['gamma'][1], prior='log-uniform')
-            # 'models_hyper']['svc']['parameters']['gamma']['low_val'], config['models_hyper']['svc']['parameters']['gamma']['max_val'], prior='log-uniform')
+            'C': Real(config['models']['svc']['hyperparameters']['C'][0],
+                      config['models']['svc']['hyperparameters']['C'][1],
+                      prior='log-uniform')
         }
-        #2e-3
-        # model_grid = SVC(random_state=0, kernel='rbf')
-        model_grid = SVC(random_state= config['models']['svc']['general']['random_state'], kernel = config['models']['svc']['hyperparameters']['kernel'])
+
+        # Adding gamma when SVC kernel is rbf
+        if config['models']['svc']['hyperparameters']['kernel'] == 'rbf':
+            parameters['gamma'] = Real(config['models']['svc']['hyperparameters']['gamma'][0],
+                                       config['models']['svc']['hyperparameters']['gamma'][1],
+                                       prior='log-uniform')
+
+
+        model_grid = SVC(random_state= config['models']['svc']['general']['random_state'],
+                         kernel = config['models']['svc']['hyperparameters']['kernel'])
 
     if model != 'lr':
+        print("[+] Computing hyper-parameters for the classifier: " + title + " ...")
+        print("[-] Hyper-parameters: {0}".format(parameters))
         clf = BayesSearchCV(model_grid, parameters,
-                            n_iter= config['hyper_bayesian']['n_iter'], n_jobs= config['hyper_bayesian']['n_jobs'], cv = config['hyper_bayesian']['cv'], n_points= config['hyper_bayesian']['n_points'])
-                            # n_iter = 30, n_jobs = 3, cv = 5, n_points = 8)
+                            n_iter= config['hyper_bayesian']['n_iter'],
+                            n_jobs= config['hyper_bayesian']['n_jobs'],
+                            cv = config['hyper_bayesian']['cv'],
+                            n_points = config['hyper_bayesian']['n_points'])
 
         clf.fit(X_train_scaled, y_train)
         print("")
@@ -168,45 +173,19 @@ def main(args):
         print(str(clf.best_params_))
         print("")
         bp = clf.best_params_
+        # Built model with the selected parameters
+        tmodel = clf
 
-# Save selected parameters to .json
-
+        # Saving selected parameters to .json
         path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(
             kfold) + "_" + "output" + ".json"
-        with open(path_param_output_json_bp, "w") as fi:
-            json.dump(bp, fi)
-
-        print("---BEST PARAMETERS SAVED ---")
-
-# Parameters selected
-
-    print("[+] PARAMETERS SELECTED MODEL " + title + " [+]")
-    print("")
-    if model == 'rf':
-        # md = int(bp.get('max_depth'))
-        #mf = int(bp.get('max_features'))
-        #ne = int(bp.get('n_estimators'))
-        #print("Max_Features: ", mf)
-        #print("n_estimators: ", ne)
-        # nit = int(bp.get('n_estimators'))
-        # print("N_Estimators: ", nit)
-        # tmodel = RandomForestClassifier(min_samples_split=2, min_samples_leaf=2, max_depth=md, random_state=0, n_estimators=nit, verbose=verbose)
-        tmodel = clf
-    elif model == 'lr':
-        print("Solver: lbfgs")
-        print("Multi_class: auto")
-        print("Penalty: none")
-        #tmodel = LogisticRegression(random_state=0, penalty='none', multi_class='auto',
-                                   # solver='lbfgs', verbose=verbose)
-        print("TMODEL")
-        tmodel = LogisticRegression(random_state= config['models']['lr']['random_state'], penalty = config['models']['lr']['penalty'], multi_class = config['models']['lr']['multi_class'],
-                                    solver= config['models']['lr']['solver'], verbose= config['models']['lr']['verbose'])
-    elif model == 'svc':
-        #cs = float(bp.get('C'))
-        #print("cs: ", cs)
-        #ga = float(bp.get('gamma'))
-        #print("ga: ", ga)
-        tmodel = clf
+        fileutils.params_to_json(bp, path_param_output_json_bp)
+    else:
+        tmodel = LogisticRegression(random_state=config['models']['lr']['random_state'],
+                                    penalty=config['models']['lr']['penalty'],
+                                    multi_class=config['models']['lr']['multi_class'],
+                                    solver=config['models']['lr']['solver'],
+                                    verbose=config['models']['lr']['verbose'])
 
 # Training models
 
@@ -214,6 +193,7 @@ def main(args):
     print("")
     print("[+] Model Training: " + title + "\n")
 
+    # Each class is modeled separately.
     tmodeldef = OneVsRestClassifier(tmodel)
 
     tmodeldef.fit(X_train_scaled, y_train_bina)
@@ -302,36 +282,35 @@ def main(args):
 
 
 
-# Automatically building the header according to the labels.
-
+# Automatically building header and rows according to the labels.
 
     # Head of header
 
     h = []
     h.append("Rep")
     h.append("Kfold")
-    h.append("Num. Vars.")
+    h.append("Num_Vars_")
 
     # Body of header
 
     for label in labels:
-        l = "Precision-" + label
+        l = "Precision_" + label
         h.append(l)
-        l = "Recall-" + label
+        l = "Recall_" + label
         h.append(l)
         l = "F1_score_" + label
         h.append(l)
-        l = "Num. Obs. " + label
+        l = "Num_Obs_" + label
         h.append (l)
         l = "AUC_" + label
         h.append(l)
 
     # Tail of header
 
-    h.append("Precision-w")
-    h.append("Recall-w")
+    h.append("Precision_w")
+    h.append("Recall_w")
     h.append("F1_score_w")
-    h.append ("Total Obs.")
+    h.append ("Total_Obs")
     h.append("AUC_w")
     h.append("Time")
 
@@ -394,22 +373,18 @@ def main(args):
     with open(path_param_output_json_fpr_test, "w") as fpr_dict:
         for name, value in fpr_test.items():
             fpr_dict.write("%s %s\n" % (labels[int(name)], value))
-        print("---FPR TEST WRITTEN---")
 
     with open(path_param_output_json_tpr_test, "w") as tpr_dict:
         for name, value in tpr_test.items():
             tpr_dict.write("%s %s\n" % (labels[int(name)], value))
-        print("---TPR TEST WRITTEN---")
 
     with open(path_param_output_json_fpr_train, "w") as fpr_dict:
         for name, value in fpr_train.items():
             fpr_dict.write("%s %s\n" % (labels[int(name)], value))
-        print("---FPR TRAIN WRITTEN---")
 
     with open(path_param_output_json_tpr_train, "w") as tpr_dict:
         for name, value in tpr_train.items():
             tpr_dict.write("%s %s\n" % (labels[int(name)], value))
-        print("---TPR TRAIN WRITTEN---")
 
     print("------------------")
     print(" [+] Time Stamp: ---" +
@@ -422,7 +397,6 @@ def main(args):
     print("Elapsed time (s): ", elapsedtime)
 
     print("[+] Finishing task at {0} ({1},{2})".format(datetime.now(), rep, kfold))
-
 
 if __name__ == "__main__":
     args = getArguments()
