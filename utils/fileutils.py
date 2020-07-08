@@ -1,6 +1,16 @@
 # coding: utf-8
 
-import glob
+"""
+    :mod:`fileutils`
+    ===========================================================================
+    :synopsis: Utility class to manage file operaations
+    :author: UCADatalab - http://datalab.uca.es, NESG (Network Engineering & Security Group) - https://nesg.ugr.es
+    :contact: ignacio.diaz@uca.es, roberto.magan@uca.es, rmagan@ugr.es
+    :organization: University of Cádiz
+    :project: ff4ml (Free Framework for Machine Learning)
+    :since: 0.0.1
+"""
+
 import yaml
 
 

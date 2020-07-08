@@ -1,0 +1,69 @@
+#
+# FF4ML simple configuration file
+#
+
+# UGR16
+
+# Dataset labels and ids
+labels:
+  - background
+  - dos
+  - nerisbotnet
+  - scan
+  - sshscan
+  - udpscan
+  - spam
+
+# Root folders
+folder_paths:
+  root_path: './data/'
+  root_path_output: './results/'
+
+# Data paths
+file_paths:
+  mc_file: 'ugr16_multiclass.csv'
+  mcfold_file: 'ugr16_multiclass_folds.csv'
+  mcvars_file: 'ugr16_multiclass_folds_selecvars.csv'
+
+# Bayesian based hyper-parameter selection
+hyper_bayesian:
+  n_iter: 30
+  n_jobs: 3
+  cv: 5
+  n_points: 8
+
+# Model's configuration
+models:
+  svc:
+    hyperparameters:
+      C:
+        - 0.1
+        - 100
+      gamma:
+        - 2e-3
+        - 2
+      kernel: 'rbf'
+
+    general:
+      random_state: 0
+      verbose: false
+
+  rf:
+    parameters:
+      n_estimators:
+        - 500 # low value
+        - 600 # high value
+      max_features:
+        - 2 # low value
+        - 16 # high value
+    general:
+      random_state: 0
+      n_jobs: 2
+      verbose: false
+
+  lr:
+    random_state: 0
+    penalty: 'none'
+    multi_class: 'auto'
+    solver: 'lbfgs'
+    verbose: false
