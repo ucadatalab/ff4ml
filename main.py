@@ -81,7 +81,7 @@ def main(args):
 
     # When executing this from the cluster, the timestamp has been set up before
     if args.timestamp:
-        ts = args.timestamp
+        ts = datetime.strftime(args.timestamp,"%Y%m%d_%H%M%S")
     else:
         ts = datetime.strftime(datetime.today(),"%Y%m%d_%H%M%S")
 
