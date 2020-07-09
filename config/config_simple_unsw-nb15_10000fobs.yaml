@@ -19,8 +19,8 @@ labels:
 
 # Root folders
 folder_paths:
-  root_path: './data/unsw-nb15/dat_batches/'
-  root_path_output: './results/'
+  root_path: '../data/unsw-nb15/dat_batches/'
+  root_path_output: '../results/'
 
 # Data paths
 file_paths:

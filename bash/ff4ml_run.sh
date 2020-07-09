@@ -7,14 +7,19 @@
 # Date: 2019/12/11
 #
 
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 3 ]; then
   echo " "
-  echo "Use: bash ff4ml_run.sh <model>"
+  echo "Use: bash ff4ml_run.sh <model> <config_file> <dataset>"
   echo "Example of use:"
   echo "<model> can be: svc, rf, lr"
+  echo "<config_file> can be: ../config/config.yaml"
+  echo "<dataset> must be the name of the dataset"
   echo " "
   exit 1
 fi
+
+# load python module
+module load anaconda/3.7
 
 # Notifications
 n_to=roberto.magan@uca.es
@@ -22,19 +27,25 @@ n_to=roberto.magan@uca.es
 # model
 model=$1
 
+# config file path
+config=$2
+
+# dataset
+dataset=$3
+
 # repetitions
 REP_START=1
-REP_END=2
+REP_END=20
 
 # K-folds
 OUTFOLD_START=1
-OUTFOLD_END=1
+OUTFOLD_END=5
 
 # execution timestamp
 exec_ts=`date +"%Y%m%d_%H%M%S"`
 
 # make the execution folder
-mkdir -p ../results/$exec_ts
+mkdir -p ../results/$dataset/$exec_ts
 
 # make the same execution folder for the logs
 mkdir -p ../logs/$exec_ts
@@ -54,8 +65,9 @@ do
     for ((k=$OUTFOLD_START; k<=$OUTFOLD_END; k++))
     do
 	echo "[-] Running task for model: $model, rep: $r, k-fold: $k"
-        sbatch $FLAGS --wrap="python ../main.py $model $r $k $exec_ts"
-        #python ../main.py $model $r $k $exec_ts
+        sbatch $FLAGS --wrap="python ../main.py --model $model --repetition $r --kfold $k --timestamp $exec_ts --configfile $config"
+        #sbatch $FLAGS --wrap="python -c \"print(10000)\""
+        #python ../main.py -m $model -r $r -k $k -cf $config
         TOTAL=`expr $TOTAL + 1`
         sleep 2s
     done
