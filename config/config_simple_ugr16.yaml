@@ -3,6 +3,8 @@
 #
 
 # UGR16
+dataset:
+  name: ugr16
 
 # Dataset labels and ids
 labels:
@@ -40,7 +42,7 @@ models:
         - 0.1
         - 100
       gamma:
-        - 2e-3
+        - 0.125
         - 2
       kernel: 'rbf'
 

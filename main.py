@@ -17,17 +17,31 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import roc_curve, roc_auc_score, auc
+from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import classification_report
-from datetime import datetime
 from sklearn.preprocessing import label_binarize
 import time
-import yaml
+from datetime import datetime
+import os
 
 from utils import fileutils
 from skopt import BayesSearchCV
 from skopt.space import Real, Integer
 
+#yaml.warnings({'YAMLLoadWarning': False})
+
+
+def valid_date(s):
+    """
+    Check is an string has a valid date format
+    :param s:
+    :return:
+    """
+    try:
+        return datetime.strptime(s, "%Y%m%d_%H%M%S")
+    except ValueError:
+        msg = "Not a valid date: '{0}'. Allowed format: %Y%m%d_%H%M%S.".format(s)
+        raise argparse.ArgumentTypeError(msg)
 
 def getArguments():
     """
@@ -37,30 +51,60 @@ def getArguments():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description='''ff4ml (Free Framework for Machine Learning)''')
-    parser.add_argument('model', metavar='MODELs', help='ML model (svc,rf,lr)', choices=['svc', 'rf', 'lr'])
-    parser.add_argument('rep', metavar='REPETITIONs', help='Repetition number (1-20).', type=int)
-    parser.add_argument('kfold', metavar='K-FOLDs', help='Kfold number (1-5).', type=int)
-    parser.add_argument('exec_ts', metavar='Timestamp', help='Timestamp.')  # Ejecución en supercomputador
-    parser.add_argument('config_file', metavar='Configuration File', help='Yaml based format configuration file path.')
+    parser.add_argument('-m','--model',
+                        help='ML model (svc,rf,lr)',
+                        choices=['svc', 'rf', 'lr'],
+                        required=True)
+    parser.add_argument('-r','--repetition',
+                        help='Repetition number (1-20).',
+                        type=int,
+                        required=True)
+    parser.add_argument('-k','--kfold',
+                        help='Kfold number (1-5).',
+                        type=int,
+                        required=True)
+    parser.add_argument('-ts','--timestamp',
+                        help='Timestamp.',
+                        type=valid_date)#Optional
+    parser.add_argument('-cf','--configfile',
+                        help='Yaml based format configuration file path.',
+                        required=True)
 
     return parser.parse_args()
 
 
 def main(args):
     model = args.model
-    rep = args.rep
+    rep = args.repetition
     kfold = args.kfold
+    config = fileutils.load_config(args.configfile)
 
-    yaml.warnings({'YAMLLoadWarning': False})
-    # ts=args.exec_ts  # Ejecución en supercomputador
-    config = fileutils.load_config(args.config_file)
+    # When executing this from the cluster, the timestamp has been set up before
+    if args.timestamp:
+        ts = args.timestamp
+    else:
+        ts = datetime.strftime(datetime.today(),"%Y%m%d_%H%M%S")
+
+    # Data root path
+    root_path = config['folder_paths']['root_path']
+    # Result root path
+    root_path_output = config['folder_paths']['root_path_output'] \
+                       + config['dataset']['name'] + os.path.sep + ts + os.path.sep
+
+    try:
+        # Create result paths
+        if not os.path.exists(root_path_output):
+            os.makedirs(root_path_output)
+    except OSError as oe:
+        print("ERROR: Sensor results directory cannot be created: %s", oe)
+        print("Exiting ...")
+        exit(1)
+
+    print("[+] Result path: {0}".format(root_path_output))
 
     instantIni = time.time()
 
     print("[+] Starting task at {0} ({1},{2})".format(datetime.now(), rep, kfold))
-
-    root_path = config['folder_paths']['root_path']
-    root_path_output = config['folder_paths']['root_path_output']
    
     mc_file = config['file_paths']['mc_file']
     mcfold_file = config['file_paths']['mcfold_file']

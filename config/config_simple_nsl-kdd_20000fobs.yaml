@@ -2,30 +2,28 @@
 # FF4ML simple configuration file
 #
 
-# UGR16
+# NSL-KDD
 dataset:
-  name: ugr16
+  name: nsl-kdd
 
 # Dataset labels and ids
 labels:
-  - label_background
-  - label_dos
-  - label_nerisbotnet
-  - label_scan
-  - label_anomaly_sshscan
-  - label_anomaly_udpscan
-  - label_anomaly_spam
+  - label_category_background
+  - label_category_dos
+  - label_category_r2l
+  - label_category_u2r
+  - label_category_probe
 
 # Root folders
 folder_paths:
-  root_path: './data/ugr16/dat_batches/'
+  root_path: './data/nsl-kdd/dat_batches/'
   root_path_output: './results/'
 
 # Data paths
 file_paths:
-  mc_file: 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass.csv'
-  mcfold_file: 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass_folds.csv'
-  mcvars_file: 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass_folds_selecvars.csv'
+  mc_file: 'output-KDD_all_extended_20000fobs_7bsize_multiclass.csv'
+  mcfold_file: 'output-KDD_all_extended_20000fobs_7bsize_multiclass_folds.csv'
+  mcvars_file: 'output-KDD_all_extended_20000fobs_7bsize_multiclass_folds_selecvars.csv'
 
 # Bayesian based hyper-parameter selection
 hyper_bayesian:

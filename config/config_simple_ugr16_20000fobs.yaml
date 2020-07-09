@@ -3,6 +3,8 @@
 #
 
 # UGR16
+dataset:
+  name: ugr16
 
 # Dataset labels and ids
 labels:
