@@ -1,0 +1,203 @@
+nohup: ignoring input
+[+] Running experiment 20200709_174137 with rep (1,20) and k-folds (1,5)
+[-] Running task for model: lr, rep: 1, k-fold: 1
+Submitted batch job 7788720
+[-] Running task for model: lr, rep: 1, k-fold: 2
+Submitted batch job 7788722
+[-] Running task for model: lr, rep: 1, k-fold: 3
+Submitted batch job 7788724
+[-] Running task for model: lr, rep: 1, k-fold: 4
+Submitted batch job 7788725
+[-] Running task for model: lr, rep: 1, k-fold: 5
+Submitted batch job 7788727
+[-] Running task for model: lr, rep: 2, k-fold: 1
+Submitted batch job 7788730
+[-] Running task for model: lr, rep: 2, k-fold: 2
+Submitted batch job 7788732
+[-] Running task for model: lr, rep: 2, k-fold: 3
+Submitted batch job 7788734
+[-] Running task for model: lr, rep: 2, k-fold: 4
+Submitted batch job 7788736
+[-] Running task for model: lr, rep: 2, k-fold: 5
+Submitted batch job 7788738
+[-] Running task for model: lr, rep: 3, k-fold: 1
+Submitted batch job 7788740
+[-] Running task for model: lr, rep: 3, k-fold: 2
+Submitted batch job 7788742
+[-] Running task for model: lr, rep: 3, k-fold: 3
+Submitted batch job 7788744
+[-] Running task for model: lr, rep: 3, k-fold: 4
+Submitted batch job 7788746
+[-] Running task for model: lr, rep: 3, k-fold: 5
+Submitted batch job 7788748
+[-] Running task for model: lr, rep: 4, k-fold: 1
+Submitted batch job 7788750
+[-] Running task for model: lr, rep: 4, k-fold: 2
+Submitted batch job 7788752
+[-] Running task for model: lr, rep: 4, k-fold: 3
+Submitted batch job 7788753
+[-] Running task for model: lr, rep: 4, k-fold: 4
+Submitted batch job 7788756
+[-] Running task for model: lr, rep: 4, k-fold: 5
+Submitted batch job 7788758
+[-] Running task for model: lr, rep: 5, k-fold: 1
+Submitted batch job 7788759
+[-] Running task for model: lr, rep: 5, k-fold: 2
+Submitted batch job 7788761
+[-] Running task for model: lr, rep: 5, k-fold: 3
+Submitted batch job 7788764
+[-] Running task for model: lr, rep: 5, k-fold: 4
+Submitted batch job 7788765
+[-] Running task for model: lr, rep: 5, k-fold: 5
+Submitted batch job 7788768
+[-] Running task for model: lr, rep: 6, k-fold: 1
+Submitted batch job 7788770
+[-] Running task for model: lr, rep: 6, k-fold: 2
+Submitted batch job 7788771
+[-] Running task for model: lr, rep: 6, k-fold: 3
+Submitted batch job 7788773
+[-] Running task for model: lr, rep: 6, k-fold: 4
+Submitted batch job 7788775
+[-] Running task for model: lr, rep: 6, k-fold: 5
+Submitted batch job 7788777
+[-] Running task for model: lr, rep: 7, k-fold: 1
+Submitted batch job 7788779
+[-] Running task for model: lr, rep: 7, k-fold: 2
+Submitted batch job 7788781
+[-] Running task for model: lr, rep: 7, k-fold: 3
+Submitted batch job 7788783
+[-] Running task for model: lr, rep: 7, k-fold: 4
+Submitted batch job 7788786
+[-] Running task for model: lr, rep: 7, k-fold: 5
+Submitted batch job 7788787
+[-] Running task for model: lr, rep: 8, k-fold: 1
+Submitted batch job 7788790
+[-] Running task for model: lr, rep: 8, k-fold: 2
+Submitted batch job 7788792
+[-] Running task for model: lr, rep: 8, k-fold: 3
+Submitted batch job 7788793
+[-] Running task for model: lr, rep: 8, k-fold: 4
+Submitted batch job 7788795
+[-] Running task for model: lr, rep: 8, k-fold: 5
+Submitted batch job 7788798
+[-] Running task for model: lr, rep: 9, k-fold: 1
+Submitted batch job 7788799
+[-] Running task for model: lr, rep: 9, k-fold: 2
+Submitted batch job 7788801
+[-] Running task for model: lr, rep: 9, k-fold: 3
+Submitted batch job 7788804
+[-] Running task for model: lr, rep: 9, k-fold: 4
+Submitted batch job 7788806
+[-] Running task for model: lr, rep: 9, k-fold: 5
+Submitted batch job 7788808
+[-] Running task for model: lr, rep: 10, k-fold: 1
+Submitted batch job 7788811
+[-] Running task for model: lr, rep: 10, k-fold: 2
+Submitted batch job 7788812
+[-] Running task for model: lr, rep: 10, k-fold: 3
+Submitted batch job 7788815
+[-] Running task for model: lr, rep: 10, k-fold: 4
+Submitted batch job 7788817
+[-] Running task for model: lr, rep: 10, k-fold: 5
+Submitted batch job 7788819
+[-] Running task for model: lr, rep: 11, k-fold: 1
+Submitted batch job 7788820
+[-] Running task for model: lr, rep: 11, k-fold: 2
+Submitted batch job 7788823
+[-] Running task for model: lr, rep: 11, k-fold: 3
+Submitted batch job 7788825
+[-] Running task for model: lr, rep: 11, k-fold: 4
+Submitted batch job 7788827
+[-] Running task for model: lr, rep: 11, k-fold: 5
+Submitted batch job 7788829
+[-] Running task for model: lr, rep: 12, k-fold: 1
+Submitted batch job 7788831
+[-] Running task for model: lr, rep: 12, k-fold: 2
+Submitted batch job 7788833
+[-] Running task for model: lr, rep: 12, k-fold: 3
+Submitted batch job 7788834
+[-] Running task for model: lr, rep: 12, k-fold: 4
+Submitted batch job 7788836
+[-] Running task for model: lr, rep: 12, k-fold: 5
+Submitted batch job 7788839
+[-] Running task for model: lr, rep: 13, k-fold: 1
+Submitted batch job 7788840
+[-] Running task for model: lr, rep: 13, k-fold: 2
+Submitted batch job 7788843
+[-] Running task for model: lr, rep: 13, k-fold: 3
+Submitted batch job 7788845
+[-] Running task for model: lr, rep: 13, k-fold: 4
+Submitted batch job 7788847
+[-] Running task for model: lr, rep: 13, k-fold: 5
+Submitted batch job 7788848
+[-] Running task for model: lr, rep: 14, k-fold: 1
+Submitted batch job 7788850
+[-] Running task for model: lr, rep: 14, k-fold: 2
+Submitted batch job 7788852
+[-] Running task for model: lr, rep: 14, k-fold: 3
+Submitted batch job 7788854
+[-] Running task for model: lr, rep: 14, k-fold: 4
+Submitted batch job 7788856
+[-] Running task for model: lr, rep: 14, k-fold: 5
+Submitted batch job 7788858
+[-] Running task for model: lr, rep: 15, k-fold: 1
+Submitted batch job 7788860
+[-] Running task for model: lr, rep: 15, k-fold: 2
+Submitted batch job 7788861
+[-] Running task for model: lr, rep: 15, k-fold: 3
+Submitted batch job 7788863
+[-] Running task for model: lr, rep: 15, k-fold: 4
+Submitted batch job 7788865
+[-] Running task for model: lr, rep: 15, k-fold: 5
+Submitted batch job 7788868
+[-] Running task for model: lr, rep: 16, k-fold: 1
+Submitted batch job 7788869
+[-] Running task for model: lr, rep: 16, k-fold: 2
+Submitted batch job 7788871
+[-] Running task for model: lr, rep: 16, k-fold: 3
+Submitted batch job 7788872
+[-] Running task for model: lr, rep: 16, k-fold: 4
+Submitted batch job 7788873
+[-] Running task for model: lr, rep: 16, k-fold: 5
+Submitted batch job 7788874
+[-] Running task for model: lr, rep: 17, k-fold: 1
+Submitted batch job 7788875
+[-] Running task for model: lr, rep: 17, k-fold: 2
+Submitted batch job 7788876
+[-] Running task for model: lr, rep: 17, k-fold: 3
+Submitted batch job 7788877
+[-] Running task for model: lr, rep: 17, k-fold: 4
+Submitted batch job 7788878
+[-] Running task for model: lr, rep: 17, k-fold: 5
+Submitted batch job 7788879
+[-] Running task for model: lr, rep: 18, k-fold: 1
+Submitted batch job 7788880
+[-] Running task for model: lr, rep: 18, k-fold: 2
+Submitted batch job 7788881
+[-] Running task for model: lr, rep: 18, k-fold: 3
+Submitted batch job 7788882
+[-] Running task for model: lr, rep: 18, k-fold: 4
+Submitted batch job 7788883
+[-] Running task for model: lr, rep: 18, k-fold: 5
+Submitted batch job 7788884
+[-] Running task for model: lr, rep: 19, k-fold: 1
+Submitted batch job 7788885
+[-] Running task for model: lr, rep: 19, k-fold: 2
+Submitted batch job 7788886
+[-] Running task for model: lr, rep: 19, k-fold: 3
+Submitted batch job 7788887
+[-] Running task for model: lr, rep: 19, k-fold: 4
+Submitted batch job 7788888
+[-] Running task for model: lr, rep: 19, k-fold: 5
+Submitted batch job 7788889
+[-] Running task for model: lr, rep: 20, k-fold: 1
+Submitted batch job 7788890
+[-] Running task for model: lr, rep: 20, k-fold: 2
+Submitted batch job 7788891
+[-] Running task for model: lr, rep: 20, k-fold: 3
+Submitted batch job 7788892
+[-] Running task for model: lr, rep: 20, k-fold: 4
+Submitted batch job 7788893
+[-] Running task for model: lr, rep: 20, k-fold: 5
+Submitted batch job 7788894
+[+] 100 repetitions have been launched for the experiment 20200709_174137
