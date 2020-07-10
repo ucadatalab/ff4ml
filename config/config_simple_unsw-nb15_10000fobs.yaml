@@ -9,13 +9,24 @@ dataset:
 labels:
   - label_background
   - label_dos
-  - label_backdoor
+  #- label_backdoor
   - label_exploit
   - label_fuzzer
   - label_generic
   - label_reconnaissance
-  - label_shellcode
-  - label_worm
+  #- label_shellcode
+  #- label_worm
+  #- label_analysis
+
+# Class distribution - We remote classes accordingly
+#label_generic           3806
+#label_background        3549
+#label_exploit           1680
+#label_fuzzer             714
+#label_reconnaissance     147
+#label_dos                102
+#label_analysis             1
+#label_backdoor             1
 
 # Root folders
 folder_paths:

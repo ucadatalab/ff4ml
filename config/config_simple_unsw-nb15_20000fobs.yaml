@@ -16,7 +16,19 @@ labels:
   - label_generic
   - label_reconnaissance
   - label_shellcode
-  - label_worm
+  #- label_worm
+  - label_analysis
+
+# Class distribution. We removed classes accordingly
+#label_generic           7164
+#label_background        7118
+#label_exploit           3371
+#label_fuzzer            1512
+#label_reconnaissance     441
+#label_dos                351
+#label_backdoor            16
+#label_analysis            14
+#label_shellcode           13
 
 # Root folders
 folder_paths:
