@@ -11,8 +11,15 @@ labels:
   - label_category_background
   - label_category_dos
   - label_category_r2l
-  - label_category_u2r
+  #- label_category_u2r
   - label_category_probe
+
+# Class distribution
+#label_category_dos           9590
+#label_category_probe          857
+#label_category_r2l            157
+#label_category_background       4
+#label_category_u2r              1
 
 # Root folders
 folder_paths:

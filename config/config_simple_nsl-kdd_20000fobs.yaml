@@ -14,6 +14,13 @@ labels:
   - label_category_u2r
   - label_category_probe
 
+# Class distribution
+#label_category_dos           16486
+#label_category_probe          3829
+#label_category_r2l             636
+#label_category_background      246
+#label_category_u2r              20
+
 # Root folders
 folder_paths:
   root_path: '../data/nsl-kdd/dat_batches/'
