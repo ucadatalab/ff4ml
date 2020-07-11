@@ -34,7 +34,8 @@ from skopt.space import Real, Integer
 def valid_date(s):
     """
     Check is an string has a valid date format
-    :param s:
+    :param s: string
+        Date string
     :return:
     """
     try:
@@ -105,6 +106,8 @@ def main(args):
     instantIni = time.time()
 
     print("[+] Starting task at {0} ({1},{2})".format(datetime.now(), rep, kfold))
+    print("[+] Task configuration:")
+    print(fileutils.print_config(config))
    
     mc_file = config['file_paths']['mc_file']
     mcfold_file = config['file_paths']['mcfold_file']

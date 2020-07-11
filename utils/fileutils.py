@@ -69,3 +69,14 @@ def params_to_json(bp, path_to_json):
     except Exception as e:
         print("There was an ERROR writing on file " + path_to_json)
         raise e
+
+
+def print_config(config):
+    """
+    Outputs all the configuration parameters and values got from the config file.
+
+    :param config: dict
+        Contains all the parameters
+    """
+    print(json.dumps(config, indent=4))
+
