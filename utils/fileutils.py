@@ -14,6 +14,7 @@
 import yaml
 import json
 
+yaml.warnings({'YAMLLoadWarning': False})
 
 def load_config(path_to_config_file):
     """
