@@ -38,6 +38,7 @@ hyper_bayesian:
   n_jobs: 3
   cv: 5
   n_points: 8
+  random_state: 0
 
 # Model's configuration
 models:

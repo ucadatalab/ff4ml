@@ -203,7 +203,8 @@ def main(args):
                             n_iter= config['hyper_bayesian']['n_iter'],
                             n_jobs= config['hyper_bayesian']['n_jobs'],
                             cv = config['hyper_bayesian']['cv'],
-                            n_points = config['hyper_bayesian']['n_points'])
+                            n_points = config['hyper_bayesian']['n_points'],
+                            random_state = config['hyper_bayesian']['random_state'])
 
         clf.fit(X_train_scaled, y_train)
         print("")
