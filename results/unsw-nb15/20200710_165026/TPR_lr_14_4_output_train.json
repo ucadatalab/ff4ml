@@ -1,6 +1,0 @@
-label_background [0.         0.99084185 1.        ]
-label_dos [0.         0.32098765 1.        ]
-label_exploit [0.         0.36532738 1.        ]
-label_fuzzer [0.         0.52714536 1.        ]
-label_generic [0.        0.9908046 1.       ]
-label_reconnaissance [0.         0.00847458 1.        ]
