@@ -155,12 +155,12 @@ def main(args):
     y_train = y.drop(y.index[rows_fold])
     y_train_bina = label_binarize(y_train, classes=labels)
 
+
 # Data TEST and LABEL
 
     X_test = X.drop(X.index[No_rows_fold])
     y_test = y.drop(y.index[No_rows_fold])
     y_test_bina = label_binarize(y_test, classes=labels)
-    n_classes = len(labels)
 
 # Data normalization
 
@@ -245,7 +245,7 @@ def main(args):
     tpr_train = dict()
     roc_auc_train = dict()
 
-    for i in range(n_classes):
+    for i, label in enumerate(labels):
         fpr_train[i], tpr_train[i], _ = roc_curve(y_train_bina[:, i], predictions_train[:, i])
         roc_auc_train[i] = auc(fpr_train[i], tpr_train[i])
 
@@ -254,13 +254,13 @@ def main(args):
     supports_sum_train = 0
     auc_partial_train = 0
 
-    for label in config['labels']:
+    for i, label in enumerate(labels):
         supports_sum_train = supports_sum_train + (clasif_train[label]['support'])
         auc_partial_train = auc_partial_train + ((clasif_train[label]['support']) * roc_auc_train[i])
     auc_w_train = auc_partial_train / supports_sum_train
 
     print("[>] Train total supports {0}".format(supports_sum_train))
-    print("[>] Train weighted average {0}".format(auc_w_train))
+    print("[>] Train AUC weighted average {0}".format(auc_w_train))
 
     print("[+] Testing ... ")
     predictions_test = tmodeldef.predict(X_test_scaled)
@@ -274,22 +274,25 @@ def main(args):
     fpr_test = dict()
     tpr_test = dict()
     roc_auc_test = dict()
-    for i in range(n_classes):
+
+    for i, label in enumerate(labels):
         fpr_test[i], tpr_test[i], _ = roc_curve(y_test_bina[:, i], predictions_test[:, i])
         roc_auc_test[i] = auc(fpr_test[i], tpr_test[i])
+    print(labels)
+    print(roc_auc_test)
 
 # weighted average
 
     supports_sum_test = 0
     auc_partial_test = 0
 
-    for label in config['labels']:
+    for i, label in enumerate(labels):
         supports_sum_test = supports_sum_test + (clasif_test[label]['support'])
         auc_partial_test = auc_partial_test + ((clasif_test[label]['support']) * roc_auc_test[i])
     auc_w_test = auc_partial_test / supports_sum_test
 
     print("[>] Test total supports {0}".format(supports_sum_test))
-    print("[>] Test weighted average {0}".format(auc_w_test))
+    print("[>] Test AUC weighted average {0}".format(auc_w_test))
 
 # Elapsed time in seconds
 
@@ -360,11 +363,11 @@ def main(args):
         line_train.append(clasif_train[label]['support'])
         line_train.append(roc_auc_train[i])
 
-    line_train.append(clasif_test['weighted avg']['precision'])
-    line_train.append(clasif_test['weighted avg']['recall'])
-    line_train.append(clasif_test['weighted avg']['f1-score'])
-    line_train.append(clasif_test['weighted avg']['support'])
-    line_train.append(auc_w_test)
+    line_train.append(clasif_train['weighted avg']['precision'])
+    line_train.append(clasif_train['weighted avg']['recall'])
+    line_train.append(clasif_train['weighted avg']['f1-score'])
+    line_train.append(clasif_train['weighted avg']['support'])
+    line_train.append(auc_w_train)
     line_train.append(elapsedtime)
 
     print("[>] Saving train results ...")
