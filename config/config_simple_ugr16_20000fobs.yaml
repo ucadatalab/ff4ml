@@ -8,13 +8,13 @@ dataset:
 
 # Dataset labels and ids
 labels:
-  - background
-  - dos
-  - nerisbotnet
-  - scan
-  - sshscan
-  - udpscan
-  - spam
+  - label_background
+  - label_dos
+  - label_nerisbotnet
+  - label_scan
+  - label_anomaly_sshscan
+  - label_anomaly_udpscan
+  - label_anomaly_spam
 
 # Root folders
 folder_paths:
@@ -43,7 +43,7 @@ models:
         - 0.1
         - 100
       gamma:
-        - 2e-3
+        - 0.125
         - 2
       kernel: 'rbf'
 
