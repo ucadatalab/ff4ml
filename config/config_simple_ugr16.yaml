@@ -33,6 +33,7 @@ hyper_bayesian:
   n_jobs: 3
   cv: 5
   n_points: 8
+  random_state: 0
 
 # Model's configuration
 models:
@@ -44,7 +45,7 @@ models:
       gamma:
         - 0.125
         - 2
-      kernel: 'rbf'
+      kernel: 'linear'
 
     general:
       random_state: 0
