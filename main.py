@@ -177,7 +177,8 @@ def main(args):
                       'max_features': Integer(config['models']['rf']['parameters']['max_features'][0],
                                               config['models']['rf']['parameters']['max_features'][1])}
         model_grid = RandomForestClassifier(random_state = config['models']['rf']['general']['random_state'],
-                                            n_jobs = config['models']['rf']['general']['n_jobs'])
+                                            n_jobs = config['models']['rf']['general']['n_jobs'],
+                                            verbose = config['models']['rf']['general']['verbose'])
 
     elif model == 'svc':
         parameters = {
@@ -193,18 +194,22 @@ def main(args):
                                        prior='log-uniform')
 
 
-        model_grid = SVC(random_state= config['models']['svc']['general']['random_state'],
-                         kernel = config['models']['svc']['hyperparameters']['kernel'])
-
+        model_grid = SVC(random_state=config['models']['svc']['general']['random_state'],
+                         kernel = config['models']['svc']['hyperparameters']['kernel'],
+                         verbose = config['models']['svc']['general']['verbose'])
+    ttotalhyper = 0
     if model != 'lr':
         print("[+] Computing hyper-parameters ...")
+        tstarthyper = time.time()
         print("[>] Hyper-parameters: {0}".format(parameters))
         clf = BayesSearchCV(model_grid, parameters,
                             n_iter= config['hyper_bayesian']['n_iter'],
                             n_jobs= config['hyper_bayesian']['n_jobs'],
                             cv = config['hyper_bayesian']['cv'],
                             n_points = config['hyper_bayesian']['n_points'],
-                            random_state = config['hyper_bayesian']['random_state'])
+                            random_state = config['hyper_bayesian']['random_state'],
+                            scoring =config['hyper_bayesian']['scoring'],
+                            verbose = config['hyper_bayesian']['verbose'])
 
         clf.fit(X_train_scaled, y_train)
         print("")
@@ -213,7 +218,17 @@ def main(args):
         print("")
         bp = clf.best_params_
         # Built model with the selected parameters
-        tmodel = clf
+        tmodel = clf.best_estimator_
+
+        # Total time spent on computing hyper-parameters
+        tendhyper = time.time()
+        ttotalhyper = tendhyper - tstarthyper
+        print("[>] Hyper-parameter selection elapsed time (s): {0}".format(ttotalhyper))
+
+        # Saving Hyper-parameter optimization results
+        path_hyper_optimization = root_path_output + model + "_" + str(rep) + "_" + str(
+            kfold) + "_" + "hyper_opt_results" + ".csv"
+        pd.DataFrame(clf.cv_results_).to_csv(path_hyper_optimization, index=False)
 
         # Saving selected parameters to .json
         path_param_output_json_bp = root_path_output + "PARAMETERS_" + model + "_" + str(rep) + "_" + str(
@@ -229,10 +244,18 @@ def main(args):
 # Training models
 
     print("[+] Training ...")
+    tstarttraining = time.time()
 
     # Each class is modeled separately.
     tmodeldef = OneVsRestClassifier(tmodel)
     tmodeldef.fit(X_train_scaled, y_train_bina)
+
+    # Total time spent on training
+    tsendtraining = time.time()
+    ttotaltraining = tsendtraining - tstarttraining
+
+    print("[>] Training model elapsed time (s): {0}".format(ttotaltraining))
+
     predictions_train = tmodeldef.predict(X_train_scaled)
 
     print("[>] Train performance ...")
@@ -263,7 +286,14 @@ def main(args):
     print("[>] Train AUC weighted average {0}".format(auc_w_train))
 
     print("[+] Testing ... ")
+    tstarttesting = time.time()
     predictions_test = tmodeldef.predict(X_test_scaled)
+
+    # Total time spent on testing
+    tsendtesting= time.time()
+    ttotaltesting = tsendtesting - tstarttesting
+
+    print("[>] Testing model elapsed time (s): {0}".format(ttotaltesting))
 
     print("[>] Test performance ...")
     clasif_test = classification_report(y_test_bina, predictions_test, output_dict=True, target_names=labels)
@@ -345,9 +375,12 @@ def main(args):
     h.append("Precision_w")
     h.append("Recall_w")
     h.append("F1_score_w")
-    h.append ("Total_Obs")
+    h.append("Total_Obs")
     h.append("AUC_w")
-    h.append("Time")
+    h.append("Hyper_time")
+    h.append("Training_time")
+    h.append("Testing_time")
+    h.append("Total_time")
 
     # Train results to .csv
 
@@ -368,6 +401,9 @@ def main(args):
     line_train.append(clasif_train['weighted avg']['f1-score'])
     line_train.append(clasif_train['weighted avg']['support'])
     line_train.append(auc_w_train)
+    line_train.append(ttotalhyper)
+    line_train.append(ttotaltraining)
+    line_train.append(ttotaltesting)
     line_train.append(elapsedtime)
 
     print("[>] Saving train results ...")
@@ -395,6 +431,9 @@ def main(args):
     line_test.append(clasif_test['weighted avg']['f1-score'])
     line_test.append(clasif_test['weighted avg']['support'])
     line_test.append(auc_w_test)
+    line_test.append(ttotalhyper)
+    line_test.append(ttotaltraining)
+    line_test.append(ttotaltesting)
     line_test.append(elapsedtime)
 
     print("[>] Saving test results ...")
