@@ -19,6 +19,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import label_binarize
 import time
 from datetime import datetime
@@ -262,28 +263,38 @@ def main(args):
     clasif_train = classification_report(y_train_bina, predictions_train, output_dict=True, target_names=labels)
     print(classification_report(y_train_bina, predictions_train, target_names=labels))
 
-    # Compute ROC and AUCs per class
+    # Compute ROC, AUC and accuracy per class
 
     fpr_train = dict()
     tpr_train = dict()
     roc_auc_train = dict()
+    accuracy_train = {}
 
     for i, label in enumerate(labels):
         fpr_train[i], tpr_train[i], _ = roc_curve(y_train_bina[:, i], predictions_train[:, i])
         roc_auc_train[i] = auc(fpr_train[i], tpr_train[i])
+        accuracy_train[i] = accuracy_score(y_train_bina[:, i], predictions_train[:, i])
+
+    print("[>] Train Labels: {0}".format(labels))
+    print("[>] Train AUC: {0}".format(roc_auc_train))
+    print("[>] Train accuracy: {0}".format(accuracy_train))
 
     # weighted average
 
     supports_sum_train = 0
     auc_partial_train = 0
+    accuracy_partial_train = 0
 
     for i, label in enumerate(labels):
         supports_sum_train = supports_sum_train + (clasif_train[label]['support'])
         auc_partial_train = auc_partial_train + ((clasif_train[label]['support']) * roc_auc_train[i])
+        accuracy_partial_train = accuracy_partial_train + ((clasif_train[label]['support']) * accuracy_train[i])
     auc_w_train = auc_partial_train / supports_sum_train
+    accuracy_w_train = accuracy_partial_train / supports_sum_train
 
     print("[>] Train total supports {0}".format(supports_sum_train))
     print("[>] Train AUC weighted average {0}".format(auc_w_train))
+    print("[>] Train accuracy weighted average {0}".format(accuracy_w_train))
 
     print("[+] Testing ... ")
     tstarttesting = time.time()
@@ -299,30 +310,39 @@ def main(args):
     clasif_test = classification_report(y_test_bina, predictions_test, output_dict=True, target_names=labels)
     print(classification_report(y_test_bina, predictions_test, target_names=labels))
 
-    # Compute ROC and AUCs per class
+    # Compute ROC, AUCs and accuracy per class
 
     fpr_test = dict()
     tpr_test = dict()
     roc_auc_test = dict()
+    accuracy_test = {}
 
     for i, label in enumerate(labels):
         fpr_test[i], tpr_test[i], _ = roc_curve(y_test_bina[:, i], predictions_test[:, i])
         roc_auc_test[i] = auc(fpr_test[i], tpr_test[i])
-    print(labels)
-    print(roc_auc_test)
+        accuracy_test[i] = accuracy_score(y_test_bina[:, i], predictions_test[:, i])
 
-# weighted average
+    print("[>] Test Labels: {0}".format(labels))
+    print("[>] Test AUC: {0}".format(roc_auc_test))
+    print("[>] Test Accuracy: {0}".format(accuracy_test))
+
+
+    # weighted average
 
     supports_sum_test = 0
     auc_partial_test = 0
+    accuracy_partial_test = 0
 
     for i, label in enumerate(labels):
         supports_sum_test = supports_sum_test + (clasif_test[label]['support'])
         auc_partial_test = auc_partial_test + ((clasif_test[label]['support']) * roc_auc_test[i])
+        accuracy_partial_test = accuracy_partial_test + ((clasif_test[label]['support']) * accuracy_test[i])
     auc_w_test = auc_partial_test / supports_sum_test
+    accuracy_w_test = accuracy_partial_test / supports_sum_test
 
     print("[>] Test total supports {0}".format(supports_sum_test))
     print("[>] Test AUC weighted average {0}".format(auc_w_test))
+    print("[>] Test accuracy weighted average {0}".format(accuracy_w_test))
 
 # Elapsed time in seconds
 
@@ -369,6 +389,8 @@ def main(args):
         h.append (l)
         l = "AUC_" + label
         h.append(l)
+        l = "Accuracy_" + label
+        h.append(l)
 
     # Tail of header
 
@@ -377,6 +399,7 @@ def main(args):
     h.append("F1_score_w")
     h.append("Total_Obs")
     h.append("AUC_w")
+    h.append("Accuracy_w")
     h.append("Hyper_time")
     h.append("Training_time")
     h.append("Testing_time")
@@ -395,12 +418,15 @@ def main(args):
         line_train.append(clasif_train[label]['f1-score'])
         line_train.append(clasif_train[label]['support'])
         line_train.append(roc_auc_train[i])
+        line_train.append(accuracy_train[i])
 
     line_train.append(clasif_train['weighted avg']['precision'])
     line_train.append(clasif_train['weighted avg']['recall'])
     line_train.append(clasif_train['weighted avg']['f1-score'])
+    # TODO: add micro an macro avg for all the computed metrics.
     line_train.append(clasif_train['weighted avg']['support'])
     line_train.append(auc_w_train)
+    line_train.append(accuracy_w_train)
     line_train.append(ttotalhyper)
     line_train.append(ttotaltraining)
     line_train.append(ttotaltesting)
@@ -425,12 +451,14 @@ def main(args):
         line_test.append(clasif_test[label]['f1-score'])
         line_test.append(clasif_test[label]['support'])
         line_test.append(roc_auc_test[i])
+        line_test.append(accuracy_test[i])
 
     line_test.append(clasif_test['weighted avg']['precision'])
     line_test.append(clasif_test['weighted avg']['recall'])
     line_test.append(clasif_test['weighted avg']['f1-score'])
     line_test.append(clasif_test['weighted avg']['support'])
     line_test.append(auc_w_test)
+    line_test.append(accuracy_w_test)
     line_test.append(ttotalhyper)
     line_test.append(ttotaltraining)
     line_test.append(ttotaltesting)
