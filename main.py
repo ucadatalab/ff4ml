@@ -248,7 +248,7 @@ def main(args):
     tstarttraining = time.time()
 
     # Each class is modeled separately.
-    tmodeldef = OneVsRestClassifier(tmodel)
+    tmodeldef = OneVsRestClassifier(tmodel, n_jobs=config['multiclass']['ovr']['n_jobs'])
     tmodeldef.fit(X_train_scaled, y_train_bina)
 
     # Total time spent on training

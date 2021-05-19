@@ -31,11 +31,11 @@ file_paths:
 hyper_bayesian:
   # This is the number of different sets of parameters chosen from the search space evaluated
   n_iter: 30
-  n_jobs: 15
-  cv: 5
+  n_jobs: 8
+  cv: 4
   # How many of the above set of parameters are going to be executed in parallel?
   # Each set is evaluated in a k-fold cross-validation process so n_points X cv = n_jobs
-  n_points: 3
+  n_points: 1
   # see https://scikit-learn.org/stable/modules/model_evaluation.html#the-scoring-parameter-defining-model-evaluation-rules
   scoring: 'f1_macro'
   random_state: 0
@@ -77,3 +77,8 @@ models:
     multi_class: 'auto'
     solver: 'lbfgs'
     verbose: 0
+
+# Multiclass technique
+multiclass:
+  ovr:
+    n_jobs: -1
