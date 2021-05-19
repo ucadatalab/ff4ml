@@ -35,11 +35,11 @@ dataset=$3
 
 # repetitions
 REP_START=1
-REP_END=20
+REP_END=1
 
 # K-folds
-OUTFOLD_START=1
-OUTFOLD_END=5
+OUTFOLD_START=2
+OUTFOLD_END=2
 
 # execution timestamp
 exec_ts=`date +"%Y%m%d_%H%M%S"`
@@ -50,8 +50,8 @@ mkdir -p ../results/$dataset/$exec_ts
 # make the same execution folder for the logs
 mkdir -p ../logs/$exec_ts
 
-#To run each task in a whole CPU
-#FLAGS="--job-name="MDPI_FE" --exclusive --cpus-per-task=1 --time=7-00:00:00 --mem=16GB --error=../logs/job.%J.err --output=../logs/job.%J.out"
+#To run each task in a whole CPU (a exclusive node with 2 processors and 8 cores each = 16 parallel jobs)
+#FLAGS="--job-name=MDPI$model --exclusive --cpus-per-task=1 --time=7-00:00:00 --mem=16GB --mail-user=$n_to --mail-type=END,FAIL,TIME_LIMIT_80 --error=../logs/$exec_ts/job.%J.err --output=../logs/$exec_ts/job.%J$"
 
 #To run each task in just one core of a CPU
 FLAGS="--job-name=MDPI$model --tasks=1 --time=7-00:00:00 --mem=16GB --mail-user=$n_to --mail-type=END,FAIL,TIME_LIMIT_80 --error=../logs/$exec_ts/job.%J.err --output=../logs/$exec_ts/job.%J.out"
