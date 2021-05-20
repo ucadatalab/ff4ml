@@ -18,14 +18,14 @@ labels:
 
 # Root folders
 folder_paths:
-  root_path: '../data/ugr16/dat_ts/'
-  root_path_output: '../results/'
+  root_path: './data/ugr16/dat_ts/'
+  root_path_output: './results/'
 
 # Data paths
 file_paths:
   mc_file: 'ugr16_multiclass.csv'
-  mcfold_file: 'ugr16_multiclass_folds.csv'
-  mcvars_file: 'ugr16_multiclass_folds_selecvars.csv'
+  mcfold_file: 'ugr16_multiclass_folds_20x5cv.csv'
+  mcvars_file: 'ugr16_multiclass_folds_selecvars_20x5cv.csv'
 
 # Bayesian based hyper-parameter selection
 hyper_bayesian:
