@@ -1,0 +1,7 @@
+background [0.         0.95280824 1.        ]
+dos [0.         0.07228916 1.        ]
+nerisbotnet [0.        0.3697479 1.       ]
+scan [0. 1.]
+sshscan [0. 1.]
+udpscan [0. 1.]
+spam [0.       0.714599 1.      ]
