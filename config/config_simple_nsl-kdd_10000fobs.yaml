@@ -29,8 +29,8 @@ folder_paths:
 # Data paths
 file_paths:
   mc_file: 'output-KDD_all_extended_10000fobs_14bsize_multiclass.csv'
-  mcfold_file: 'output-KDD_all_extended_10000fobs_14bsize_multiclass_folds.csv'
-  mcvars_file: 'output-KDD_all_extended_10000fobs_14bsize_multiclass_folds_selecvars.csv'
+  mcfold_file: 'output-KDD_all_extended_10000fobs_14bsize_multiclass_folds_20x5.csv'
+  mcvars_file: 'output-KDD_all_extended_10000fobs_14bsize_multiclass_folds_selecvars_20x5.csv'
 
 # Bayesian based hyper-parameter selection
 hyper_bayesian:

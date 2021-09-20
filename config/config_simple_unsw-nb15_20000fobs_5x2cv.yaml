@@ -5,28 +5,30 @@
 # UNSW-NB15
 dataset:
   name: unsw-nb15
+
 # Dataset labels and ids
 labels:
   - label_background
   - label_dos
-  #- label_backdoor
+  - label_backdoor
   - label_exploit
   - label_fuzzer
   - label_generic
   - label_reconnaissance
-  #- label_shellcode
+  - label_shellcode
   #- label_worm
-  #- label_analysis
+  - label_analysis
 
-# Class distribution - We remote classes accordingly
-#label_generic           3806
-#label_background        3549
-#label_exploit           1680
-#label_fuzzer             714
-#label_reconnaissance     147
-#label_dos                102
-#label_analysis             1
-#label_backdoor             1
+# Class distribution. We removed classes accordingly
+#label_generic           7164
+#label_background        7118
+#label_exploit           3371
+#label_fuzzer            1512
+#label_reconnaissance     441
+#label_dos                351
+#label_backdoor            16
+#label_analysis            14
+#label_shellcode           13
 
 # Root folders
 folder_paths:
@@ -35,9 +37,9 @@ folder_paths:
 
 # Data paths
 file_paths:
-  mc_file: 'output-NB15_all_extended_10000fobs_254bsize_multiclass.csv'
-  mcfold_file: 'output-NB15_all_extended_10000fobs_254bsize_multiclass_folds_20x5.csv'
-  mcvars_file: 'output-NB15_all_extended_10000fobs_254bsize_multiclass_folds_selecvars_20x5.csv'
+  mc_file: 'output-NB15_all_extended_20000fobs_127bsize_multiclass.csv'
+  mcfold_file: 'output-NB15_all_extended_20000fobs_127bsize_multiclass_folds_5x2cv.csv'
+  mcvars_file: 'output-NB15_all_extended_20000fobs_127bsize_multiclass_folds_selecvars_5x2cv.csv'
 
 # Bayesian based hyper-parameter selection
 hyper_bayesian:

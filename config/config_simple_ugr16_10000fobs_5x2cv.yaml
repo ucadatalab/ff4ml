@@ -2,42 +2,30 @@
 # FF4ML simple configuration file
 #
 
-# UNSW-NB15
+# UGR16
 dataset:
-  name: unsw-nb15
+  name: ugr16
+
 # Dataset labels and ids
 labels:
   - label_background
   - label_dos
-  #- label_backdoor
-  - label_exploit
-  - label_fuzzer
-  - label_generic
-  - label_reconnaissance
-  #- label_shellcode
-  #- label_worm
-  #- label_analysis
-
-# Class distribution - We remote classes accordingly
-#label_generic           3806
-#label_background        3549
-#label_exploit           1680
-#label_fuzzer             714
-#label_reconnaissance     147
-#label_dos                102
-#label_analysis             1
-#label_backdoor             1
+  - label_nerisbotnet
+  - label_scan
+  - label_anomaly_sshscan
+  - label_anomaly_udpscan
+  - label_anomaly_spam
 
 # Root folders
 folder_paths:
-  root_path: '../data/unsw-nb15/dat_batches/'
+  root_path: '../data/ugr16/dat_batches/'
   root_path_output: '../results/'
 
 # Data paths
 file_paths:
-  mc_file: 'output-NB15_all_extended_10000fobs_254bsize_multiclass.csv'
-  mcfold_file: 'output-NB15_all_extended_10000fobs_254bsize_multiclass_folds_20x5.csv'
-  mcvars_file: 'output-NB15_all_extended_10000fobs_254bsize_multiclass_folds_selecvars_20x5.csv'
+  mc_file: 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass.csv'
+  mcfold_file: 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass_folds_5x2cv.csv'
+  mcvars_file: 'output-UGR16_all_extended_10000fobs_395082bsize_multiclass_folds_selecvars_5x2cv.csv'
 
 # Bayesian based hyper-parameter selection
 hyper_bayesian:
