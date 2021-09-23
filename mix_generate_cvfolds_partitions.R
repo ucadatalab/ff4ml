@@ -7,9 +7,9 @@ NUMOBS   = "20000"
 NUMREPS  = 20
 NUMFOLDS = 5
 
-dataset = read.csv(file=paste0("./data/mix/rowwise/dat_batches/output-rowise_", NUMOBS, "fobs_multiclass.csv"), header=T, sep=",")
+dataset = read.csv(file=paste0("./data/mix/rowwise/dat_batches/output-rowise_", NUMOBS, "fobs_multiclass.csv"), header=T, sep=",", stringsAsFactors = F)
 
-outcome    = dataset$outcome
+outcome = paste0(dataset$dataset, ".", dataset$outcome)
 
 set.seed(1234) #para replicar los resultados al relanzar
 folds = sapply(1:NUMREPS, function(i) createFolds(y = factor(outcome), k=NUMFOLDS, list=F))
