@@ -1,0 +1,6 @@
+label_background [0.         0.01375436 1.        ]
+label_dos [0.00000000e+00 3.78787879e-04 1.00000000e+00]
+label_exploit [0.         0.00615801 1.        ]
+label_fuzzer [0.00000000e+00 8.07428341e-04 1.00000000e+00]
+label_generic [0.0000000e+00 2.0173492e-04 1.0000000e+00]
+label_reconnaissance [0. 0. 1.]
