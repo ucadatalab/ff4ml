@@ -18,8 +18,8 @@ labels:
 
 # Root folders
 folder_paths:
-  root_path: './data/ugr16/dat_ts/'
-  root_path_output: './results/'
+  root_path: '../data/ugr16/dat_ts/'
+  root_path_output: '../results/'
 
 # Data paths
 file_paths:
@@ -52,7 +52,7 @@ models:
       gamma:
         - 0.125
         - 2
-      kernel: 'linear'
+      kernel: 'rbf'
 
     general:
       random_state: 0

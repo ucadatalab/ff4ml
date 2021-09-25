@@ -1,0 +1,90 @@
+#
+# FF4ML simple configuration file
+#
+
+# NSL-KDD
+dataset:
+  name: nsl-kdd
+
+# Dataset labels and ids
+labels:
+  - label_category_background
+  - label_category_dos
+  - label_category_r2l
+  #- label_category_u2r
+  - label_category_probe
+
+# Class distribution
+#label_category_dos           9590
+#label_category_probe          857
+#label_category_r2l            157
+#label_category_background       4
+#label_category_u2r              1
+
+# Root folders
+folder_paths:
+  root_path: '../data/nsl-kdd/dat_batches/'
+  root_path_output: '../results/'
+
+# Data paths
+file_paths:
+  mc_file: 'output-KDD_all_extended_10000fobs_14bsize_multiclass.csv'
+  mcfold_file: 'output-KDD_all_extended_10000fobs_14bsize_multiclass_folds_5x2cv.csv'
+  mcvars_file: 'output-KDD_all_extended_10000fobs_14bsize_multiclass_folds_selecvars_5x2cv.csv'
+
+# Bayesian based hyper-parameter selection
+hyper_bayesian:
+  # This is the number of different sets of parameters chosen from the search space evaluated
+  n_iter: 30
+  n_jobs: 16
+  cv: 5
+  # How many of the above set of parameters are going to be executed in parallel?
+  # Each set is evaluated in a k-fold cross-validation process so n_points X cv = n_jobs
+  n_points: 3
+  # see https://scikit-learn.org/stable/modules/model_evaluation.html#the-scoring-parameter-defining-model-evaluation-rules
+  scoring: 'f1_macro'
+  random_state: 0
+  # Verbosity level, 0 means no verbosity
+  verbose: 3
+
+# Model's configuration
+models:
+  svc:
+    hyperparameters:
+      C:
+        - 0.1
+        - 10
+      gamma:
+        - 0.125
+        - 2
+      kernel: 'linear'
+
+    general:
+      random_state: 0
+      verbose: 0
+
+  rf:
+    parameters:
+      n_estimators:
+        - 500 # low value
+        - 600 # high value
+      max_features:
+        - 2 # low value
+        - 16 # high value
+    general:
+      random_state: 0
+      n_jobs: 2
+      verbose: 0
+
+  lr:
+    random_state: 0
+    penalty: 'none'
+    multi_class: 'auto'
+    solver: 'lbfgs'
+    verbose: 0
+
+# Multiclass technique
+multiclass:
+  ovr:
+    # -1 means use all available computing cores
+    n_jobs: -1
