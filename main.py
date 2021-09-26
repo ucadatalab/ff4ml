@@ -130,12 +130,6 @@ def main(args):
     f.remove("")
     if kfold == 1:
         f.remove("caja.de.test")
-
-# Data separation and label
-
-    X = df[f]
-    y = df['outcome']
-
 # Creation of TRAINING and TEST datasets according to the number of fold
 
     print("[+] Getting the repetition and fold ...")
@@ -144,9 +138,38 @@ def main(args):
     rows_fold = df_folds.iloc[df_folds.groupby(group).groups[kfold]].index
     No_rows_fold = df_folds[df_folds[group] != kfold][group].index
 
+# Data separation and label
+
+    X = df[f]
+    y = df['outcome']
+
 # Getting labels from config file
 
     labels = config['labels']
+
+# Mixing datasets
+    X_test_mix = {}
+    y_test_mix = {}
+
+    if 'sets' in config['dataset']: # Getting all X, y for each inner dataset
+        # for each dataset
+        print("[+] Found {0} inner datasets.".format(config['dataset']['sets']))
+        for dataset in config['dataset']['sets']:
+            print("[+] Building test part for {0} dataset.".format(dataset))
+            #X
+            X_test = df.drop(df.index[No_rows_fold])
+            X_test = X_test.reset_index(drop=True)
+            X_test = X_test.iloc[X_test.groupby('dataset').groups[dataset]]
+            X_test = StandardScaler().fit_transform(X_test[f])  # Feature selection and standard scaling
+            X_test_mix[dataset] = X_test # Feature Selection
+
+            # y
+            y_test = df[['outcome', 'dataset']]
+            y_test = y_test.drop(y_test.index[No_rows_fold])
+            y_test = y_test.reset_index()
+            y_test = y_test[y_test['dataset'] == dataset]
+            y_test = y_test['outcome']
+            y_test_mix[dataset] = label_binarize(y_test, classes=labels)
 
     print("[+] Building train and test parts ...")
 
@@ -296,6 +319,138 @@ def main(args):
     print("[>] Train AUC weighted average {0}".format(auc_w_train))
     print("[>] Train accuracy weighted average {0}".format(accuracy_w_train))
 
+    # Head of header
+
+    h = []
+    h.append("Rep")
+    h.append("Kfold")
+    h.append("Num_Vars_")
+
+    # Body of header
+
+    for label in labels:
+        l = "Precision_" + label
+        h.append(l)
+        l = "Recall_" + label
+        h.append(l)
+        l = "F1_score_" + label
+        h.append(l)
+        l = "Num_Obs_" + label
+        h.append(l)
+        l = "AUC_" + label
+        h.append(l)
+        l = "Accuracy_" + label
+        h.append(l)
+
+    # Tail of header
+
+    h.append("Precision_w")
+    h.append("Recall_w")
+    h.append("F1_score_w")
+    h.append("Total_Obs")
+    h.append("AUC_w")
+    h.append("Accuracy_w")
+    h.append("Hyper_time")
+    h.append("Training_time")
+    h.append("Testing_time")
+    h.append("Total_time")
+
+    if 'sets' in config['dataset']: # Testing inner datasets
+        for dataset in config['dataset']['sets']:
+            print("[+] Testing {0} dataset.".format(dataset))
+            tstarttesting = time.time()
+            predictions_test= tmodeldef.predict(X_test_mix[dataset])
+            tsendtesting = time.time()
+            ttotaltesting = tsendtesting - tstarttesting
+            print("[>] Testing {0} elapsed time (s): {1}".format(dataset,ttotaltesting))
+
+            print("[>] Test {0} performance.".format(dataset))
+            clasif_test = classification_report(y_test_mix[dataset], predictions_test, output_dict=True, target_names=labels)
+            print(classification_report(y_test_mix[dataset], predictions_test, target_names=labels))
+
+            # Compute ROC, AUCs and accuracy per class
+
+            fpr_test = dict()
+            tpr_test = dict()
+            roc_auc_test = dict()
+            accuracy_test = {}
+
+            for i, label in enumerate(labels):
+                fpr_test[i], tpr_test[i], _ = roc_curve(y_test_mix[dataset][:, i], predictions_test[:, i])
+                roc_auc_test[i] = auc(fpr_test[i], tpr_test[i])
+                accuracy_test[i] = accuracy_score(y_test_mix[dataset][:, i], predictions_test[:, i])
+
+            print("[>] Test {0} Labels: {1}".format(labels,dataset))
+            print("[>] Test {0} AUC: {1}".format(roc_auc_test,dataset))
+            print("[>] Test {0} Accuracy: {1}".format(accuracy_test,dataset))
+
+            # weighted average
+
+            supports_sum_test = 0
+            auc_partial_test = 0
+            accuracy_partial_test = 0
+
+            for i, label in enumerate(labels):
+                supports_sum_test = supports_sum_test + (clasif_test[label]['support'])
+                auc_partial_test = auc_partial_test + ((clasif_test[label]['support']) * roc_auc_test[i])
+                accuracy_partial_test = accuracy_partial_test + ((clasif_test[label]['support']) * accuracy_test[i])
+            auc_w_test = auc_partial_test / supports_sum_test
+            accuracy_w_test = accuracy_partial_test / supports_sum_test
+
+            print("[>] Test {0} total supports {1}".format(supports_sum_test, dataset))
+            print("[>] Test {0} AUC weighted average {1}".format(auc_w_test, dataset))
+            print("[>] Test {0} accuracy weighted average {1}".format(accuracy_w_test, dataset))
+
+            path_param_output_test = root_path_output + model + "_" + str(rep) + "_" + str(
+                kfold) + "_" + "output_test_" + dataset + ".csv"
+
+            path_param_output_json_fpr_test = root_path_output + "FPR_" + model + "_" + str(rep) + "_" + str(
+                kfold) + "_" + "output_test_" + dataset + ".json"
+            path_param_output_json_tpr_test = root_path_output + "TPR_" + model + "_" + str(rep) + "_" + str(
+                kfold) + "_" + "output_test_" + dataset + ".json"
+
+            # Test results to .csv
+
+            line_test = []
+            line_test.append(rep)
+            line_test.append(kfold)
+            line_test.append(len(f))  # Number of selected variables
+
+            for i, label in enumerate(labels):
+                line_test.append(clasif_test[label]['precision'])
+                line_test.append(clasif_test[label]['recall'])
+                line_test.append(clasif_test[label]['f1-score'])
+                line_test.append(clasif_test[label]['support'])
+                line_test.append(roc_auc_test[i])
+                line_test.append(accuracy_test[i])
+
+            line_test.append(clasif_test['weighted avg']['precision'])
+            line_test.append(clasif_test['weighted avg']['recall'])
+            line_test.append(clasif_test['weighted avg']['f1-score'])
+            line_test.append(clasif_test['weighted avg']['support'])
+            line_test.append(auc_w_test)
+            line_test.append(accuracy_w_test)
+            line_test.append(ttotalhyper)
+            line_test.append(ttotaltraining)
+            line_test.append(ttotaltesting)
+            line_test.append(ttotaltesting)
+
+            print("[>] Saving test results for {0}".format(dataset))
+
+            data_test = pd.DataFrame(line_test, h)
+            data_test = data_test.T
+            data_test.to_csv(path_param_output_test, index=False)
+
+            print("[>] Saving test FPR and TPR results for {0}".format(dataset))
+
+            with open(path_param_output_json_fpr_test, "w") as fpr_dict:
+                for name, value in fpr_test.items():
+                    fpr_dict.write("%s %s\n" % (labels[int(name)], value))
+
+            with open(path_param_output_json_tpr_test, "w") as tpr_dict:
+                for name, value in tpr_test.items():
+                    tpr_dict.write("%s %s\n" % (labels[int(name)], value))
+
     print("[+] Testing ... ")
     tstarttesting = time.time()
     predictions_test = tmodeldef.predict(X_test_scaled)
@@ -368,43 +523,6 @@ def main(args):
         kfold) + "_" + "output_train" + ".json"
 
 # Automatically building header and rows according to the labels.
-
-    # Head of header
-
-    h = []
-    h.append("Rep")
-    h.append("Kfold")
-    h.append("Num_Vars_")
-
-    # Body of header
-
-    for label in labels:
-        l = "Precision_" + label
-        h.append(l)
-        l = "Recall_" + label
-        h.append(l)
-        l = "F1_score_" + label
-        h.append(l)
-        l = "Num_Obs_" + label
-        h.append (l)
-        l = "AUC_" + label
-        h.append(l)
-        l = "Accuracy_" + label
-        h.append(l)
-
-    # Tail of header
-
-    h.append("Precision_w")
-    h.append("Recall_w")
-    h.append("F1_score_w")
-    h.append("Total_Obs")
-    h.append("AUC_w")
-    h.append("Accuracy_w")
-    h.append("Hyper_time")
-    h.append("Training_time")
-    h.append("Testing_time")
-    h.append("Total_time")
-
     # Train results to .csv
 
     line_train = []
