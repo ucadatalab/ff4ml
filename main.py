@@ -190,8 +190,17 @@ def main(args):
 
     print("[+] Scaling data ...")
 
-    X_train_scaled = StandardScaler().fit_transform(X_train)
-    X_test_scaled = StandardScaler().fit_transform(X_test)
+    standar_scaler = StandardScaler().fit(X_train)
+    X_train_scaled = standar_scaler.transform(X_train)
+    if 'data_preprocessing' in config:
+        if config['data_preprocessing'] == 'train':
+            # Normalizing from the training set
+            X_test_scaled = standar_scaler.transform(X_test)
+        else:
+            X_test_scaled = StandardScaler().fit_transform(X_test)
+    else:
+        # Backward compatibility
+        X_test_scaled = StandardScaler().fit_transform(X_test)
 
 # Hyperparameters Selection
 

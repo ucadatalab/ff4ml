@@ -1,0 +1,93 @@
+#
+# FF4ML simple configuration file
+#
+
+# UGR16 and NB15 for testing and training interchangeably
+dataset:
+  name: 'mix/rowwise'
+  #sets:
+    #- ugr16
+    #- unsw-nb15
+    #- nsl-kdd
+# Dataset labels and ids
+labels:
+  - background
+  - dos
+  - scan
+
+# Class distribution
+
+# Root folders
+folder_paths:
+  root_path: './data/mix/rowwise/dat_batches/'
+  root_path_output: './results/'
+
+# Data paths
+file_paths:
+  mc_file: 'output-rowise_ugr16_unsw_nb15_20000fobs_multiclass.csv'
+  mcfold_file: 'output-rowise_ugr16_unsw_nb15_20000fobs_multiclass_folds.csv'
+  mcvars_file: 'nb15_all_extended_20000fobs_multiclass_selecvars_alldataset.csv'
+
+# Pre-processing
+data_preprocessing:
+  # Always standard scaling
+  # train: to apply mean and standad deviaton to the test set got from training set
+  # test: to apply mean and standad deviaton to the test set got from test set
+  type: 'train'
+
+# Bayesian based hyper-parameter selection
+hyper_bayesian:
+  # This is the number of different sets of parameters chosen from the search space evaluated
+  n_iter: 30
+  n_jobs: 8
+  cv: 5
+  # How many of the above set of parameters are going to be executed in parallel?
+  # Each set is evaluated in a k-fold cross-validation process so n_points X cv = n_jobs
+  n_points: 3
+  # see https://scikit-learn.org/stable/modules/model_evaluation.html#the-scoring-parameter-defining-model-evaluation-rules
+  scoring: 'f1_macro'
+  random_state: 0
+  # Verbosity level, 0 means no verbosity
+  verbose: 3
+
+# Model's configuration
+models:
+  svc:
+    hyperparameters:
+      C:
+        - 0.1
+        - 10
+      gamma:
+        - 0.125
+        - 2
+      kernel: 'linear'
+
+    general:
+      random_state: 0
+      verbose: 0
+
+  rf:
+    parameters:
+      n_estimators:
+        - 500 # low value
+        - 600 # high value
+      max_features:
+        - 2 # low value
+        - 16 # high value
+    general:
+      random_state: 0
+      n_jobs: 2
+      verbose: 0
+
+  lr:
+    random_state: 0
+    penalty: 'none'
+    multi_class: 'auto'
+    solver: 'lbfgs'
+    verbose: 0
+
+# Multiclass technique
+multiclass:
+  ovr:
+    # -1 means use all available computing cores
+    n_jobs: -1
