@@ -1,3 +1,5 @@
 .idea
 logs
 .ipynb_*
+
+.Rhistory
