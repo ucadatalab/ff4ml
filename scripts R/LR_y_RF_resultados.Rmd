@@ -1,0 +1,174 @@
+---
+title: "Results obtained from the executed experiments"
+author: "Daniel Urda"
+date: "10/4/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd("/.../.../.../ff4ml/results/")
+```
+
+# 1. Reflejo de la Tabla 4 del paper
+
+AUC promedio de 20x5cv en el UGR'16.
+
+```{r LR_table4, echo=FALSE}
+lr10000 = read.csv(file = "./ugr16/R execution/ugr16_LR_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr20000 = read.csv(file = "./ugr16/R execution/ugr16_LR_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf10000 = read.csv(file = "./ugr16/R execution/ugr16_RF_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf20000 = read.csv(file = "./ugr16/R execution/ugr16_RF_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+
+avg.lr10000 = colMeans(lr10000[,4:9])
+avg.lr20000 = colMeans(lr20000[,4:9])
+avg.rf10000 = colMeans(rf10000[,4:9])
+avg.rf20000 = colMeans(rf20000[,4:9])
+
+table4 = rbind(data.frame(NObs=rep(10000, 6), Model=rep("LR", 6), Class=gsub("auc.", "", names(avg.lr10000)), Auc=round(avg.lr10000, 3)),
+               data.frame(NObs=rep(10000, 6), Model=rep("RF", 6), Class=gsub("auc.", "", names(avg.rf10000)), Auc=round(avg.rf10000, 3)),
+               data.frame(NObs=rep(20000, 6), Model=rep("LR", 6), Class=gsub("auc.", "", names(avg.lr20000)), Auc=round(avg.lr20000, 3)),
+               data.frame(NObs=rep(20000, 6), Model=rep("RF", 6), Class=gsub("auc.", "", names(avg.rf20000)), Auc=round(avg.rf20000, 3)))
+rownames(table4) = NULL
+
+kable(table4)
+```
+
+
+# 2. Reflejo de la Tabla 5 del paper
+
+AUC promedio de 20x5cv en el UNSW-NB15.
+
+```{r LR_table5, echo=FALSE}
+lr10000 = read.csv(file = "./unsw-nb15/R execution/nb15_LR_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr20000 = read.csv(file = "./unsw-nb15/R execution/nb15_LR_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf10000 = read.csv(file = "./unsw-nb15/R execution/nb15_RF_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf20000 = read.csv(file = "./unsw-nb15/R execution/nb15_RF_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+
+avg.lr10000 = colMeans(lr10000[,4:10])
+avg.lr20000 = colMeans(lr20000[,4:11])
+avg.rf10000 = colMeans(rf10000[,4:10])
+avg.rf20000 = colMeans(rf20000[,4:11])
+
+table5 = rbind(data.frame(NObs=rep(10000, 7), Model=rep("LR", 7), Class=gsub("auc.", "", names(avg.lr10000)), Auc=round(avg.lr10000, 3)),
+               data.frame(NObs=rep(10000, 7), Model=rep("RF", 7), Class=gsub("auc.", "", names(avg.rf10000)), Auc=round(avg.rf10000, 3)),
+               data.frame(NObs=rep(20000, 8), Model=rep("LR", 8), Class=gsub("auc.", "", names(avg.lr20000)), Auc=round(avg.lr20000, 3)),
+               data.frame(NObs=rep(20000, 8), Model=rep("RF", 8), Class=gsub("auc.", "", names(avg.rf20000)), Auc=round(avg.rf20000, 3)))
+rownames(table5) = NULL
+
+kable(table5)
+```
+
+
+# 3. Reflejo de la Tabla 6 del paper
+
+AUC promedio de 20x5cv en el NLS-KDD.
+
+```{r LR_table6, echo=FALSE}
+lr10000 = read.csv(file = "./nsl-kdd/R execution/kdd_LR_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr20000 = read.csv(file = "./nsl-kdd/R execution/kdd_LR_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf10000 = read.csv(file = "./nsl-kdd/R execution/kdd_RF_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf20000 = read.csv(file = "./nsl-kdd/R execution/kdd_RF_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+
+avg.lr10000 = colMeans(lr10000[,4:8], na.rm = T)
+avg.lr20000 = colMeans(lr20000[,4:9], na.rm = T)
+avg.rf10000 = colMeans(rf10000[,4:8], na.rm = T)
+avg.rf20000 = colMeans(rf20000[,4:9], na.rm = T)
+
+table6 = rbind(data.frame(NObs=rep(10000, 5), Model=rep("LR", 5), Class=gsub("auc.", "", names(avg.lr10000)), Auc=round(avg.lr10000, 3)),
+               data.frame(NObs=rep(10000, 5), Model=rep("RF", 5), Class=gsub("auc.", "", names(avg.rf10000)), Auc=round(avg.rf10000, 3)),
+               data.frame(NObs=rep(20000, 6), Model=rep("LR", 6), Class=gsub("auc.", "", names(avg.lr20000)), Auc=round(avg.lr20000, 3)),
+               data.frame(NObs=rep(20000, 6), Model=rep("RF", 6), Class=gsub("auc.", "", names(avg.rf20000)), Auc=round(avg.rf20000, 3)))
+rownames(table6) = NULL
+
+kable(table6)
+```
+
+
+# 4. Reflejo de la Tabla 7 del paper
+
+AUC promedio de 20x5cv en el mix dataset: global, sin hacer distinción del dataset al que originalmente pertenece cada muestra de la caja de test.
+
+```{r LR_table7, echo=FALSE}
+lr10000 = read.csv(file = "./mix/rowwise/R execution/mix-mix_LR_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr20000 = read.csv(file = "./mix/rowwise/R execution/mix-mix_LR_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf10000 = read.csv(file = "./mix/rowwise/R execution/mix-mix_RF_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf20000 = read.csv(file = "./mix/rowwise/R execution/mix-mix_RF_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+
+avg.lr10000 = colMeans(lr10000[,4:7], na.rm = T)
+avg.lr20000 = colMeans(lr20000[,4:7], na.rm = T)
+avg.rf10000 = colMeans(rf10000[,4:7], na.rm = T)
+avg.rf20000 = colMeans(rf20000[,4:7], na.rm = T)
+
+table7 = rbind(data.frame(NObs=rep(10000, 4), Model=rep("LR", 4), Class=gsub("auc.", "", names(avg.lr10000)), Auc=round(avg.lr10000, 3)),
+               data.frame(NObs=rep(10000, 4), Model=rep("RF", 4), Class=gsub("auc.", "", names(avg.rf10000)), Auc=round(avg.rf10000, 3)),
+               data.frame(NObs=rep(20000, 4), Model=rep("LR", 4), Class=gsub("auc.", "", names(avg.lr20000)), Auc=round(avg.lr20000, 3)),
+               data.frame(NObs=rep(20000, 4), Model=rep("RF", 4), Class=gsub("auc.", "", names(avg.rf20000)), Auc=round(avg.rf20000, 3)))
+rownames(table7) = NULL
+
+kable(table7)
+```
+
+
+# 5. Reflejo de la Tabla 8 del paper
+
+AUC de entreno y validación en dataset completamente independientes.
+
+```{r LR_table8, echo=FALSE}
+lr10000 = read.csv(file = "./crossed_LR_10000_results.csv", header=T, sep=",", stringsAsFactors = F)[,c(1,2,4:7)]
+lr20000 = read.csv(file = "./crossed_LR_20000_results.csv", header=T, sep=",", stringsAsFactors = F)[,c(1,2,4:7)]
+rf10000 = read.csv(file = "./crossed_RF_10000_results.csv", header=T, sep=",", stringsAsFactors = F)[,c(1,2,4:7)]
+rf20000 = read.csv(file = "./crossed_RF_20000_results.csv", header=T, sep=",", stringsAsFactors = F)[,c(1,2,4:7)]
+
+table8 = rbind(data.frame(NObs=rep(10000, 6), Model=rep("LR", 6), lr10000),
+               data.frame(NObs=rep(10000, 6), Model=rep("RF", 6), rf10000),
+               data.frame(NObs=rep(20000, 6), Model=rep("LR", 6), lr20000),
+               data.frame(NObs=rep(20000, 6), Model=rep("RF", 6), rf20000))
+rownames(table8) = NULL
+
+kable(table8)
+```
+
+
+# 6. Reflejo de la Tabla 9 del paper
+
+AUC promedio de 20x5cv en el mix dataset: zoom en las muestras de test en función del dataset de origen.
+
+```{r LR_table9, echo=FALSE}
+lr10000.ugr16 = read.csv(file = "./mix/rowwise/R execution/mix-ugr16_LR_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr10000.nb15  = read.csv(file = "./mix/rowwise/R execution/mix-nb15_LR_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr10000.kdd   = read.csv(file = "./mix/rowwise/R execution/mix-kdd_LR_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr20000.ugr16 = read.csv(file = "./mix/rowwise/R execution/mix-ugr16_LR_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr20000.nb15  = read.csv(file = "./mix/rowwise/R execution/mix-nb15_LR_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+lr20000.kdd   = read.csv(file = "./mix/rowwise/R execution/mix-kdd_LR_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf10000.ugr16 = read.csv(file = "./mix/rowwise/R execution/mix-ugr16_RF_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf10000.nb15  = read.csv(file = "./mix/rowwise/R execution/mix-nb15_RF_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf10000.kdd   = read.csv(file = "./mix/rowwise/R execution/mix-kdd_RF_10000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf20000.ugr16 = read.csv(file = "./mix/rowwise/R execution/mix-ugr16_RF_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf20000.nb15  = read.csv(file = "./mix/rowwise/R execution/mix-nb15_RF_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+rf20000.kdd   = read.csv(file = "./mix/rowwise/R execution/mix-kdd_RF_20000_results.csv", header=T, sep=",", stringsAsFactors = F)
+
+avg.lr10000.ugr16 = colMeans(lr10000.ugr16[,4:7], na.rm = T)
+avg.lr10000.nb15  = colMeans(lr10000.nb15[,4:7], na.rm = T)
+avg.lr10000.kdd   = colMeans(lr10000.kdd[,4:7], na.rm = T)
+avg.lr20000.ugr16 = colMeans(lr20000.ugr16[,4:7], na.rm = T)
+avg.lr20000.nb15  = colMeans(lr20000.nb15[,4:7], na.rm = T)
+avg.lr20000.kdd   = colMeans(lr20000.kdd[,4:7], na.rm = T)
+avg.rf10000.ugr16 = colMeans(rf10000.ugr16[,4:7], na.rm = T)
+avg.rf10000.nb15  = colMeans(rf10000.nb15[,4:7], na.rm = T)
+avg.rf10000.kdd   = colMeans(rf10000.kdd[,4:7], na.rm = T)
+avg.rf20000.ugr16 = colMeans(rf20000.ugr16[,4:7], na.rm = T)
+avg.rf20000.nb15  = colMeans(rf20000.nb15[,4:7], na.rm = T)
+avg.rf20000.kdd   = colMeans(rf20000.kdd[,4:7], na.rm = T)
+
+table9 = rbind(data.frame(NObs=rep(10000, 4), Model=rep("LR", 4), Class=gsub("auc.", "", names(avg.lr10000.ugr16)), Auc.UGR16=round(avg.lr10000.ugr16, 3), Auc.NB15=round(avg.lr10000.nb15, 3), Auc.KDD=round(avg.lr10000.kdd, 3)),
+               data.frame(NObs=rep(10000, 4), Model=rep("RF", 4), Class=gsub("auc.", "", names(avg.rf10000.ugr16)), Auc.UGR16=round(avg.rf10000.ugr16, 3), Auc.NB15=round(avg.rf10000.nb15, 3), Auc.KDD=round(avg.rf10000.kdd, 3)),
+               data.frame(NObs=rep(20000, 4), Model=rep("LR", 4), Class=gsub("auc.", "", names(avg.lr20000.ugr16)), Auc.UGR16=round(avg.lr20000.ugr16, 3), Auc.NB15=round(avg.lr20000.nb15, 3), Auc.KDD=round(avg.lr20000.kdd, 3)),
+               data.frame(NObs=rep(20000, 4), Model=rep("RF", 4), Class=gsub("auc.", "", names(avg.rf20000.ugr16)), Auc.UGR16=round(avg.rf20000.ugr16, 3), Auc.NB15=round(avg.rf20000.nb15, 3), Auc.KDD=round(avg.rf20000.kdd, 3)))
+rownames(table9) = NULL
+
+kable(table9)
+```
