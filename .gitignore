@@ -1,5 +1,5 @@
 .idea
 logs
 .ipynb_*
-
 .Rhistory
+.DS_Store
