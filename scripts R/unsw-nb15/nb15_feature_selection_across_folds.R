@@ -4,14 +4,22 @@ library(caret)
 library(glmnet)
 
 
+TYPE     = "ts"     # ts ó batches
 NUMOBS   = "20000"
-NUMREPS  = 5
-NUMFOLDS = 2
+NUMREPS  = 20
+NUMFOLDS = 5
 
-dataset = read.csv(file=paste0("./data/unsw-nb15/dat_batches/nb15_all_extended_", NUMOBS, "fobs_multiclass.csv"), header=T, sep=",")
-folds   = read.csv(file=paste0("./data/unsw-nb15/dat_batches/nb15_all_extended_", NUMOBS, "fobs_multiclass_folds_", NUMREPS, "x", NUMFOLDS, "cv.csv"), header=T, sep=",")
-outfile.name = paste0("./data/unsw-nb15/dat_batches/nb15_all_extended_", NUMOBS, "fobs_multiclass_folds_selecvars_", NUMREPS, "x", NUMFOLDS, "cv.csv")
-X = dataset[,1:134]
+if (TYPE == "ts") {
+     dataset = read.csv(file=paste0("./data/unsw-nb15/dat_", TYPE, "/unsw-nb15_multiclass.csv"), header=T, sep=",")
+     folds   = read.csv(file=paste0("./data/unsw-nb15/dat_", TYPE, "/unsw-nb15_multiclass_folds_", NUMREPS, "x", NUMFOLDS, "cv.csv"), header=T, sep=",")
+     outfile.name = paste0("./data/unsw-nb15/dat_", TYPE, "/unsw-nb15_multiclass_folds_selecvars_", NUMREPS, "x", NUMFOLDS, "cv.csv")
+     X = dataset[,1:134]
+} else {
+     dataset = read.csv(file=paste0("./data/unsw-nb15/dat_batches/nb15_all_extended_", NUMOBS, "fobs_multiclass.csv"), header=T, sep=",")
+     folds   = read.csv(file=paste0("./data/unsw-nb15/dat_batches/nb15_all_extended_", NUMOBS, "fobs_multiclass_folds_", NUMREPS, "x", NUMFOLDS, "cv.csv"), header=T, sep=",")
+     outfile.name = paste0("./data/unsw-nb15/dat_batches/nb15_all_extended_", NUMOBS, "fobs_multiclass_folds_selecvars_", NUMREPS, "x", NUMFOLDS, "cv.csv")
+     X = dataset[,1:134]
+}
 y = dataset[,ncol(dataset)]
 
 header = c("repeticion","caja.de.test", colnames(X))

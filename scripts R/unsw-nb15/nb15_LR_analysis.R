@@ -4,7 +4,7 @@ library(ModelMetrics)
 library(nnet)
 
 
-setwd("/.../.../.../.../ff4ml/")
+#setwd("/.../.../.../.../ff4ml/")
 
 
 
@@ -29,7 +29,7 @@ compute.auc.global <- function(y.test, probs.test) {
 
 
 compute.acc.global <- function(y.test, predclass.test) {
-        confmat <- confusionMatrix(data=y.test, reference=predclass.test)
+        confmat <- caret::confusionMatrix(data=y.test, reference=predclass.test)
         result  <- c(confmat$overall[1], as.numeric(confmat$byClass[,11]))
         result
 }
@@ -37,22 +37,35 @@ compute.acc.global <- function(y.test, predclass.test) {
 
 
 
+TYPE    = "ts"
 NOBS    = 10000 #-> 10000 or 20000
-OUTFILE = paste0(".../results/unsw-nb15/R execution/nb15_LR_", NOBS, "_results.csv")
 
-if (NOBS == 10000) {
-        datos.nb15       = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_10000fobs_254bsize_multiclass.csv"), header=T, sep=",", stringsAsFactors = F)
-        folds.nb15       = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_10000fobs_254bsize_multiclass_folds_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
-        varselected.nb15 = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_10000fobs_254bsize_multiclass_folds_selecvars_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
+
+if (TYPE == "ts") {
+     OUTFILE = paste0("./results/unsw-nb15/R execution/nb15_LR_", TYPE, "_results.csv")
+     datos.nb15       = read.csv(file=paste0("./data/unsw-nb15/dat_ts/unsw-nb15_multiclass.csv"), header=T, sep=",", stringsAsFactors = F)
+     folds.nb15       = read.csv(file=paste0("./data/unsw-nb15/dat_ts/unsw-nb15_multiclass_folds_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
+     varselected.nb15 = read.csv(file=paste0("./data/unsw-nb15/dat_ts/unsw-nb15_multiclass_folds_selecvars_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)     
+} else if (NOBS == 10000) {
+     OUTFILE = paste0(".../results/unsw-nb15/R execution/dat_", TYPE, "/nb15_LR_", NOBS, "_results.csv")
+     datos.nb15       = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_10000fobs_254bsize_multiclass.csv"), header=T, sep=",", stringsAsFactors = F)
+     folds.nb15       = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_10000fobs_254bsize_multiclass_folds_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
+     varselected.nb15 = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_10000fobs_254bsize_multiclass_folds_selecvars_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
 } else {
-        datos.nb15       = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_20000fobs_127bsize_multiclass.csv"), header=T, sep=",", stringsAsFactors = F)
-        folds.nb15       = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_20000fobs_127bsize_multiclass_folds_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
-        varselected.nb15 = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_20000fobs_127bsize_multiclass_folds_selecvars_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
+     datos.nb15       = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_20000fobs_127bsize_multiclass.csv"), header=T, sep=",", stringsAsFactors = F)
+     folds.nb15       = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_20000fobs_127bsize_multiclass_folds_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
+     varselected.nb15 = read.csv(file=paste0(".../data/unsw-nb15/dat_batches/output-NB15_all_extended_20000fobs_127bsize_multiclass_folds_selecvars_20x5cv.csv"), header=T, sep=",", stringsAsFactors = F)
 }
 datos.nb15$outcome <- gsub("label_", "", datos.nb15$outcome)
-idx.toremove      <- which(datos.nb15$outcome %in% c("analysis","backdoor"))
-datos.nb15         <- datos.nb15[-idx.toremove,]
-folds.nb15         <- folds.nb15[-idx.toremove,]
+if (TYPE=="ts") {
+     idx.toremove      <- which(datos.nb15$outcome %in% c("dos"))
+} else {
+     idx.toremove      <- which(datos.nb15$outcome %in% c("analysis","backdoor"))    
+}
+if (length(idx.toremove > 0)) {
+     datos.nb15         <- datos.nb15[-idx.toremove,]
+     folds.nb15         <- folds.nb15[-idx.toremove,]
+}
 
 X        = datos.nb15[,1:134]
 y        = as.factor(datos.nb15$outcome)
@@ -92,7 +105,9 @@ for (REP in 1:20) {
                 global <- rbind(global, c(REP, FOLD, compute.auc.global(y.test, probs.test), compute.acc.global(y.test, predclass.test)))
         }
 }
-if (NOBS == 10000) {
+if (TYPE == "ts") {
+     colnames(global) <- c("Repetition", "Fold", "auc.multiclass", "auc.background", "auc.exploit", "auc.fuzzer", "auc.generic", "auc.weighted", "acc.overall", "acc.background", "acc.exploit", "acc.fuzzer", "acc.generic")
+} else if (NOBS == 10000) {
         colnames(global) <- c("Repetition", "Fold", "auc.multiclass", "auc.background", "auc.dos", "auc.exploit", "auc.fuzzer", "auc.generic", "auc.reconnaissance", "auc.weighted", "acc.overall", "acc.background", "acc.dos", "acc.exploit", "acc.fuzzer", "acc.generic", "acc.reconnaissance")
 } else {
         colnames(global) <- c("Repetition", "Fold", "auc.multiclass", "auc.background", "auc.dos", "auc.exploit", "auc.fuzzer", "auc.generic", "auc.reconnaissance", "auc.shellcode", "auc.weighted", "acc.overall", "acc.background", "acc.dos", "acc.exploit", "acc.fuzzer", "acc.generic", "acc.reconnaissance", "acc.shellcode")
